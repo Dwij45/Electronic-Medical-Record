@@ -68,12 +68,18 @@ const Sidebar = () => {
     }
   };
 
-  const drawerWidth = sidebarMini && !isMobile ? MINI_DRAWER_WIDTH : DRAWER_WIDTH;
+  // Fixed: Proper width calculation
+  const getDrawerWidth = () => {
+    if (isMobile) return DRAWER_WIDTH;
+    return sidebarMini ? MINI_DRAWER_WIDTH : DRAWER_WIDTH;
+  };
+
+  const drawerWidth = getDrawerWidth();
 
   const drawer = (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <Toolbar>
-        {!sidebarMini && (
+        {(!sidebarMini || isMobile) && (
           <Box display="flex" alignItems="center" justifyContent="space-between" width="100%">
             <Box display="flex" alignItems="center">
               <HospitalIcon color="primary" sx={{ mr: 1 }} />
@@ -83,7 +89,7 @@ const Sidebar = () => {
             </Box>
             {!isMobile && (
               <IconButton onClick={toggleMiniSidebar} size="small">
-                {sidebarMini ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+                <ChevronLeftIcon />
               </IconButton>
             )}
           </Box>
@@ -103,7 +109,7 @@ const Sidebar = () => {
       <List sx={{ flexGrow: 1, px: 1 }}>
         {menuItems.map((item) => (
           <ListItem key={item.text} disablePadding>
-            <Tooltip title={sidebarMini ? item.text : ''} placement="right">
+            <Tooltip title={sidebarMini && !isMobile ? item.text : ''} placement="right">
               <ListItemButton
                 onClick={() => handleNavigation(item.path)}
                 selected={isActive(item.path)}
@@ -111,8 +117,8 @@ const Sidebar = () => {
                   mb: 0.5,
                   borderRadius: 2,
                   minHeight: 48,
-                  justifyContent: sidebarMini ? 'center' : 'initial',
-                  px: sidebarMini ? 0 : 2,
+                  justifyContent: sidebarMini && !isMobile ? 'center' : 'initial',
+                  px: sidebarMini && !isMobile ? 0 : 2,
                   '&.Mui-selected': {
                     backgroundColor: 'primary.main',
                     color: 'primary.contrastText',
@@ -124,14 +130,14 @@ const Sidebar = () => {
                 <ListItemIcon
                   sx={{
                     minWidth: 0,
-                    mr: sidebarMini ? 0 : 3,
+                    mr: sidebarMini && !isMobile ? 0 : 3,
                     justifyContent: 'center',
                     color: isActive(item.path) ? 'primary.contrastText' : 'text.secondary',
                   }}
                 >
                   {item.icon}
                 </ListItemIcon>
-                {!sidebarMini && (
+                {(!sidebarMini || isMobile) && (
                   <ListItemText
                     primary={item.text}
                     primaryTypographyProps={{
@@ -146,7 +152,7 @@ const Sidebar = () => {
         ))}
       </List>
 
-      {!sidebarMini && (
+      {(!sidebarMini || isMobile) && (
         <>
           <Divider sx={{ mx: 2 }} />
 
@@ -176,7 +182,7 @@ const Sidebar = () => {
       <List sx={{ px: 1 }}>
         {bottomMenuItems.map((item) => (
           <ListItem key={item.text} disablePadding>
-            <Tooltip title={sidebarMini ? item.text : ''} placement="right">
+            <Tooltip title={sidebarMini && !isMobile ? item.text : ''} placement="right">
               <ListItemButton
                 onClick={() => handleNavigation(item.path)}
                 selected={isActive(item.path)}
@@ -184,8 +190,8 @@ const Sidebar = () => {
                   mb: 0.5,
                   borderRadius: 2,
                   minHeight: 48,
-                  justifyContent: sidebarMini ? 'center' : 'initial',
-                  px: sidebarMini ? 0 : 2,
+                  justifyContent: sidebarMini && !isMobile ? 'center' : 'initial',
+                  px: sidebarMini && !isMobile ? 0 : 2,
                   '&.Mui-selected': {
                     backgroundColor: 'primary.main',
                     color: 'primary.contrastText',
@@ -197,14 +203,14 @@ const Sidebar = () => {
                 <ListItemIcon
                   sx={{
                     minWidth: 0,
-                    mr: sidebarMini ? 0 : 3,
+                    mr: sidebarMini && !isMobile ? 0 : 3,
                     justifyContent: 'center',
                     color: isActive(item.path) ? 'primary.contrastText' : 'text.secondary',
                   }}
                 >
                   {item.icon}
                 </ListItemIcon>
-                {!sidebarMini && (
+                {(!sidebarMini || isMobile) && (
                   <ListItemText
                     primary={item.text}
                     primaryTypographyProps={{
@@ -220,7 +226,7 @@ const Sidebar = () => {
       </List>
 
       {/* Footer */}
-      {!sidebarMini && (
+      {(!sidebarMini || isMobile) && (
         <Box sx={{ p: 2, textAlign: 'center' }}>
           <Typography variant="caption" color="text.secondary">
             Healthcare EMR v1.0
@@ -267,15 +273,13 @@ const Sidebar = () => {
         /* Desktop Drawer */
         <Drawer
           variant="permanent"
-          open={sidebarOpen}
           sx={{
-            width: sidebarOpen ? drawerWidth : 0,
+            width: drawerWidth,
             flexShrink: 0,
-            transition: 'width 0.3s ease',
             '& .MuiDrawer-paper': {
               width: drawerWidth,
               boxSizing: 'border-box',
-              transition: 'width 0.3s ease',
+              transition: 'width 0.225s cubic-bezier(0.0, 0, 0.2, 1)',
               overflowX: 'hidden',
               background: darkMode
                 ? 'linear-gradient(180deg, #1e1e1e 0%, #2d2d2d 100%)'

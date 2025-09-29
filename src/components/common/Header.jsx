@@ -33,7 +33,7 @@ import terminologyService from '../../services/terminology.service';
 const Header = () => {
   const { user, logout } = useAuth();
   const { darkMode, toggleDarkMode } = useThemeMode();
-  const { sidebarOpen, toggleSidebar, isMobile } = useSidebar();
+  const { sidebarOpen, sidebarMini, toggleSidebar, toggleMiniSidebar, isMobile } = useSidebar();
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
   const [notificationCount] = useState(3);
@@ -74,6 +74,24 @@ const Header = () => {
     }
   };
 
+  // Fixed: Use appropriate toggle based on device type
+  const handleSidebarToggle = () => {
+    if (isMobile) {
+      toggleSidebar(); // For mobile: open/close sidebar
+    } else {
+      toggleMiniSidebar(); // For desktop: toggle mini/full sidebar
+    }
+  };
+
+  // Fixed: Show correct icon based on device and state
+  const getSidebarIcon = () => {
+    if (isMobile) {
+      return sidebarOpen ? <MenuOpenIcon /> : <MenuIcon />;
+    } else {
+      return sidebarMini ? <MenuIcon /> : <MenuOpenIcon />;
+    }
+  };
+
   return (
     <AppBar
       position="fixed"
@@ -82,15 +100,15 @@ const Header = () => {
       }}
     >
       <Toolbar>
-        {/* Menu Button - Always visible */}
+        {/* Fixed Menu Button */}
         <IconButton
           color="inherit"
           aria-label="toggle sidebar"
-          onClick={toggleSidebar}
+          onClick={handleSidebarToggle}
           edge="start"
           sx={{ mr: 2 }}
         >
-          {sidebarOpen ? <MenuOpenIcon /> : <MenuIcon />}
+          {getSidebarIcon()}
         </IconButton>
 
         <Typography 
@@ -99,7 +117,7 @@ const Header = () => {
           component="div" 
           sx={{ 
             flexGrow: 1,
-            fontSize: { xs: '1rem', sm: '1.25rem' } // Responsive font size
+            fontSize: { xs: '1rem', sm: '1.25rem' }
           }}
         >
           Healthcare EMR
@@ -108,7 +126,7 @@ const Header = () => {
             variant="caption" 
             sx={{ 
               ml: 1, 
-              display: { xs: 'none', md: 'inline' } // Hide subtitle on mobile
+              display: { xs: 'none', md: 'inline' }
             }}
           >
             - Terminology Integration
