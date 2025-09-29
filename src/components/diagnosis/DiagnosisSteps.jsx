@@ -3,14 +3,18 @@ import {
     Grid, Typography, Card, CardContent, Autocomplete, TextField, Button, Box,
     Alert, Checkbox, FormControlLabel, FormControl, InputLabel, Select, MenuItem,
     Chip, Divider, CircularProgress, Table, TableBody, TableCell, TableContainer,
-    TableHead, TableRow, List, ListItem, ListItemText, ListItemIcon, Paper
+    TableHead, TableRow, List, ListItem, ListItemText, ListItemIcon, Paper,
+    Switch
 } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import {
     PersonAdd, Security, History, LocalHospital, Code, Assignment, CheckCircle,
     Search, Phone, Verified, MedicalServices, Warning, AccessTime, LocalPharmacy
 } from '@mui/icons-material';
+
+// Import mock data and traditional diseases
 import { mockPatients, mockDiseases } from '../../data/mockData';
+import { traditionalDiseases, ayushSystems } from '../../data/traditionalDiseases';
 
 // Patient Selection Step
 export const PatientSelection = ({ selectedPatient, setSelectedPatient }) => {
@@ -91,7 +95,7 @@ export const PatientSelection = ({ selectedPatient, setSelectedPatient }) => {
                                 <Grid item xs={12} md={6}>
                                     <Typography variant="body2"><strong>Contact:</strong> {selectedPatient.contactNumber}</Typography>
                                     <Typography variant="body2"><strong>Blood Group:</strong> {selectedPatient.bloodGroup}</Typography>
-                                    {selectedPatient.allergies.length > 0 && (
+                                    {selectedPatient.allergies && selectedPatient.allergies.length > 0 && (
                                         <Typography variant="body2" color="error">
                                             <strong>Allergies:</strong> {selectedPatient.allergies.join(', ')}
                                         </Typography>
@@ -106,7 +110,7 @@ export const PatientSelection = ({ selectedPatient, setSelectedPatient }) => {
     );
 };
 
-// OTP Verification Step - FIXED
+// OTP Verification Step
 export const OTPVerification = ({ selectedPatient, otpData, setOtpData, loading, setLoading, setError }) => {
     const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString();
 
@@ -121,7 +125,7 @@ export const OTPVerification = ({ selectedPatient, otpData, setOtpData, loading,
                 ...otpData,
                 otpSent: true,
                 otpCode: otpCode,
-                timeRemaining: 60, // 1 minute
+                timeRemaining: 60,
                 enteredOtp: '',
                 verified: false
             });
@@ -270,7 +274,7 @@ export const OTPVerification = ({ selectedPatient, otpData, setOtpData, loading,
             {otpData.verified && (
                 <Grid item xs={12}>
                     <Alert severity="success" icon={<Verified />}>
-                        <strong>🎉 Authentication Successful!</strong> You can proceed to the next step.
+                        <strong> Authentication Successful!</strong> You can proceed to the next step.
                     </Alert>
                 </Grid>
             )}
@@ -296,7 +300,7 @@ export const MedicalHistoryReview = ({ selectedPatient, historyReviewed, setHist
                             Previous Diagnoses & Treatments
                         </Typography>
 
-                        {selectedPatient?.medicalHistory.length > 0 ? (
+                        {selectedPatient?.medicalHistory && selectedPatient.medicalHistory.length > 0 ? (
                             selectedPatient.medicalHistory.map((record) => (
                                 <Card key={record.id} sx={{ mb: 2 }}>
                                     <CardContent>
@@ -340,7 +344,7 @@ export const MedicalHistoryReview = ({ selectedPatient, historyReviewed, setHist
                         <Typography variant="h6" gutterBottom>
                             Recent Vitals
                         </Typography>
-                        {selectedPatient?.vitalsHistory.length > 0 ? (
+                        {selectedPatient?.vitalsHistory && selectedPatient.vitalsHistory.length > 0 ? (
                             <TableContainer>
                                 <Table size="small">
                                     <TableHead>
@@ -374,7 +378,7 @@ export const MedicalHistoryReview = ({ selectedPatient, historyReviewed, setHist
                         <Typography variant="h6" gutterBottom>
                             Recent Lab Results
                         </Typography>
-                        {selectedPatient?.labResults.length > 0 ? (
+                        {selectedPatient?.labResults && selectedPatient.labResults.length > 0 ? (
                             <List dense>
                                 {selectedPatient.labResults.map((lab, index) => (
                                     <ListItem key={index}>
@@ -397,7 +401,7 @@ export const MedicalHistoryReview = ({ selectedPatient, historyReviewed, setHist
                 </Card>
             </Grid>
 
-            {selectedPatient?.allergies.length > 0 && (
+            {selectedPatient?.allergies && selectedPatient.allergies.length > 0 && (
                 <Grid item xs={12}>
                     <Alert severity="error" icon={<Warning />}>
                         <strong>ALLERGIES ALERT:</strong> Patient is allergic to: {selectedPatient.allergies.join(', ')}
@@ -520,14 +524,21 @@ export const ClinicalAssessment = ({ encounterData, setEncounterData }) => {
     );
 };
 
-// Diagnosis Coding Step - FIXED with Search
-// Diagnosis Coding Step - CRASH-PROOF VERSION
+// Enhanced DiagnosisCoding with Dual Coding
 export const DiagnosisCoding = ({ diagnosisData, setDiagnosisData }) => {
+    // Existing modern medicine search state
     const [diseaseSearchTerm, setDiseaseSearchTerm] = useState('');
     const [filteredDiseases, setFilteredDiseases] = useState([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
 
-    // Safe filter function with error handling
+    // NEW: Traditional medicine state
+    const [traditionalMode, setTraditionalMode] = useState(false);
+    const [selectedAyushSystem, setSelectedAyushSystem] = useState('');
+    const [traditionalSearchTerm, setTraditionalSearchTerm] = useState('');
+    const [traditionalSuggestions, setTraditionalSuggestions] = useState([]);
+    const [dualCodedDiagnoses, setDualCodedDiagnoses] = useState([]);
+
+    // Existing modern medicine search logic
     useEffect(() => {
         try {
             if (diseaseSearchTerm && diseaseSearchTerm.trim().length >= 2) {
@@ -537,16 +548,9 @@ export const DiagnosisCoding = ({ diagnosisData, setDiagnosisData }) => {
                         return (
                             (disease.name && disease.name.toLowerCase().includes(searchLower)) ||
                             (disease.category && disease.category.toLowerCase().includes(searchLower)) ||
-                            (disease.icd11Code && disease.icd11Code.toLowerCase().includes(searchLower)) ||
-                            (disease.namasteCode && disease.namasteCode.toLowerCase().includes(searchLower)) ||
-                            (disease.description && disease.description.toLowerCase().includes(searchLower)) ||
-                            (disease.commonSymptoms && Array.isArray(disease.commonSymptoms) &&
-                                disease.commonSymptoms.some(symptom =>
-                                    symptom && symptom.toLowerCase().includes(searchLower)
-                                ))
+                            (disease.icd11Code && disease.icd11Code.toLowerCase().includes(searchLower))
                         );
                     } catch (filterError) {
-                        console.error('Error filtering disease:', disease, filterError);
                         return false;
                     }
                 });
@@ -557,132 +561,108 @@ export const DiagnosisCoding = ({ diagnosisData, setDiagnosisData }) => {
                 setShowSuggestions(false);
             }
         } catch (error) {
-            console.error('Error in disease filter effect:', error);
-            setFilteredDiseases([]);
-            setShowSuggestions(false);
+            console.error('Error in disease filter:', error);
         }
     }, [diseaseSearchTerm]);
 
-    // Safe disease selection with comprehensive error handling
+    // NEW: Traditional medicine search
+    const searchTraditionalTerms = (searchTerm) => {
+        if (searchTerm.length < 2) {
+            setTraditionalSuggestions([]);
+            return;
+        }
+
+        const results = traditionalDiseases.filter(disease =>
+            disease.system === selectedAyushSystem &&
+            disease.searchTerms.some(term =>
+                term.toLowerCase().includes(searchTerm.toLowerCase())
+            )
+        );
+
+        setTraditionalSuggestions(results.slice(0, 5));
+    };
+
+    // NEW: Handle traditional disease selection with dual coding
+    const handleTraditionalDiseaseSelect = (disease) => {
+        const dualCodeEntry = {
+            id: `DC_${Date.now()}`,
+            traditional: {
+                namasteCode: disease.namasteCode,
+                sanskritName: disease.sanskritName,
+                englishName: disease.englishName,
+                system: disease.system
+            },
+            modern: {
+                icd11Code: disease.icd11Code,
+                modernName: disease.modernEquivalent
+            },
+            tm2: {
+                icd11TM2Code: disease.icd11TM2Code,
+                tm2Name: `Traditional ${disease.modernEquivalent}`
+            },
+            isDualCoded: true,
+            severity: 'Moderate',
+            timestamp: new Date().toISOString()
+        };
+
+        // Add to dual coded diagnoses
+        setDualCodedDiagnoses(prev => [...prev, dualCodeEntry]);
+
+        // Also add to regular selected diseases for compatibility
+        const regularDiseaseEntry = {
+            ...disease,
+            id: dualCodeEntry.id,
+            name: disease.modernEquivalent,
+            severity: 'Moderate',
+            isDualCoded: true
+        };
+
+        setDiagnosisData({
+            ...diagnosisData,
+            selectedDiseases: [...(diagnosisData.selectedDiseases || []), regularDiseaseEntry]
+        });
+
+        setTraditionalSearchTerm('');
+        setTraditionalSuggestions([]);
+    };
+
+    // Existing modern disease selection
     const handleDiseaseSelection = (disease) => {
         try {
-            if (!disease || !disease.id) {
-                console.error('Invalid disease object:', disease);
-                return;
-            }
-
-            if (!diagnosisData || !Array.isArray(diagnosisData.selectedDiseases)) {
-                console.error('Invalid diagnosisData structure:', diagnosisData);
-                return;
-            }
+            if (!disease || !disease.id) return;
+            if (!diagnosisData || !Array.isArray(diagnosisData.selectedDiseases)) return;
 
             const isSelected = diagnosisData.selectedDiseases.some(d => d && d.id === disease.id);
-
             if (!isSelected) {
-                const newDiseaseSelection = {
-                    ...disease,
-                    severity: 'Moderate' // Default severity
-                };
-
                 const updatedDiagnosisData = {
                     ...diagnosisData,
-                    selectedDiseases: [...diagnosisData.selectedDiseases, newDiseaseSelection]
+                    selectedDiseases: [...diagnosisData.selectedDiseases, { ...disease, severity: 'Moderate' }]
                 };
-
                 setDiagnosisData(updatedDiagnosisData);
-
-                // Clear search after successful selection
                 setDiseaseSearchTerm('');
                 setShowSuggestions(false);
-
-                console.log('Disease selected successfully:', disease.name);
-            } else {
-                console.log('Disease already selected:', disease.name);
             }
         } catch (error) {
             console.error('Error selecting disease:', error);
-            alert('Error selecting disease. Please try again.');
         }
     };
 
-    // Safe disease removal
+    // Remove disease selection
     const removeDiseaseSelection = (diseaseId) => {
         try {
-            if (!diseaseId) {
-                console.error('Invalid diseaseId for removal');
-                return;
-            }
-
-            if (!diagnosisData || !Array.isArray(diagnosisData.selectedDiseases)) {
-                console.error('Invalid diagnosisData for removal:', diagnosisData);
-                return;
-            }
-
             const updatedDiagnosisData = {
                 ...diagnosisData,
                 selectedDiseases: diagnosisData.selectedDiseases.filter(d => d && d.id !== diseaseId)
             };
-
             setDiagnosisData(updatedDiagnosisData);
-            console.log('Disease removed successfully:', diseaseId);
+
+            // Also remove from dual coded diagnoses
+            setDualCodedDiagnoses(prev => prev.filter(dc => dc.id !== diseaseId));
         } catch (error) {
             console.error('Error removing disease:', error);
-            alert('Error removing disease. Please try again.');
         }
     };
 
-    // Safe severity update
-    const updateDiseaseSeverity = (diseaseId, severity) => {
-        try {
-            if (!diseaseId || !severity) {
-                console.error('Invalid parameters for severity update:', { diseaseId, severity });
-                return;
-            }
-
-            if (!diagnosisData || !Array.isArray(diagnosisData.selectedDiseases)) {
-                console.error('Invalid diagnosisData for severity update:', diagnosisData);
-                return;
-            }
-
-            const updatedDiagnosisData = {
-                ...diagnosisData,
-                selectedDiseases: diagnosisData.selectedDiseases.map(disease => {
-                    if (disease && disease.id === diseaseId) {
-                        return { ...disease, severity };
-                    }
-                    return disease;
-                })
-            };
-
-            setDiagnosisData(updatedDiagnosisData);
-            console.log('Severity updated successfully:', { diseaseId, severity });
-        } catch (error) {
-            console.error('Error updating disease severity:', error);
-            alert('Error updating severity. Please try again.');
-        }
-    };
-
-    // Safe search change handler
-    const handleSearchChange = (event) => {
-        try {
-            const value = event?.target?.value || '';
-            setDiseaseSearchTerm(value);
-        } catch (error) {
-            console.error('Error handling search change:', error);
-        }
-    };
-
-    // Safe clear search
-    const clearSearch = () => {
-        try {
-            setDiseaseSearchTerm('');
-            setShowSuggestions(false);
-        } catch (error) {
-            console.error('Error clearing search:', error);
-        }
-    };
-
-    // Safe check for selected diseases
     const selectedDiseases = diagnosisData?.selectedDiseases || [];
 
     return (
@@ -694,7 +674,157 @@ export const DiagnosisCoding = ({ diagnosisData, setDiagnosisData }) => {
                 </Typography>
             </Grid>
 
-            {/* Disease Search Box */}
+            {/* NEW: Traditional Medicine Toggle */}
+            <Grid item xs={12}>
+                <Card sx={{
+                    border: traditionalMode ? '2px solid' : '1px solid',
+                    borderColor: traditionalMode ? 'success.main' : 'divider',
+                    bgcolor: traditionalMode ? 'success.50' : 'background.paper',
+                    boxShadow: traditionalMode ? 4 : 1,
+                    transition: 'all 0.3s ease'
+                }}>
+
+                    <CardContent>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <Box>
+                                <Typography variant="h6">
+                                    Traditional Medicine (AYUSH)
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary">
+                                    Enable dual coding: NAMASTE + ICD-11 TM2 + ICD-11 Biomedicine
+                                </Typography>
+                            </Box>
+                            <Switch
+                                checked={traditionalMode}
+                                onChange={(e) => setTraditionalMode(e.target.checked)}
+                                sx={{
+                                    '& .MuiSwitch-switchBase.Mui-checked': {
+                                        color: 'success.main',
+                                    },
+                                    '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                                        backgroundColor: 'success.main',
+                                    },
+                                }}
+                            />
+                        </Box>
+
+                        {traditionalMode && (
+                            <Box sx={{ mt: 2 }}>
+                                {/* AYUSH System Selection */}
+                                <FormControl fullWidth sx={{ mb: 2 }}>
+                                    <InputLabel>Select AYUSH System</InputLabel>
+                                    <Select
+                                        value={selectedAyushSystem}
+                                        onChange={(e) => setSelectedAyushSystem(e.target.value)}
+                                        sx={{
+                                            '& .MuiOutlinedInput-notchedOutline': {
+                                                borderColor: selectedAyushSystem ? 'success.main' : 'divider',
+                                            },
+                                            '&:hover .MuiOutlinedInput-notchedOutline': {
+                                                borderColor: 'success.main',
+                                            },
+                                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                borderColor: 'success.main',
+                                            },
+                                        }}
+                                    >
+                                        {ayushSystems.map(system => (
+                                            <MenuItem key={system.id} value={system.id}>
+                                                {system.name}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+
+                                {/* Traditional Search */}
+                                {selectedAyushSystem && (
+                                    <Box>
+                                        <TextField
+                                            fullWidth
+                                            label="Search Traditional Disease"
+                                            placeholder="Try: शिरोरोग or shirog or headache"
+                                            value={traditionalSearchTerm}
+                                            onChange={(e) => {
+                                                setTraditionalSearchTerm(e.target.value);
+                                                searchTraditionalTerms(e.target.value);
+                                            }}
+                                            sx={{
+                                                mb: 2,
+                                                '& .MuiOutlinedInput-root': {
+                                                    '&:hover fieldset': {
+                                                        borderColor: 'success.main',
+                                                    },
+                                                    '&.Mui-focused fieldset': {
+                                                        borderColor: 'success.main',
+                                                    },
+                                                },
+                                                '& .MuiInputLabel-root': {
+                                                    '&.Mui-focused': {
+                                                        color: 'success.main',
+                                                    },
+                                                },
+                                            }}
+                                        />
+                                        {/* Traditional Suggestions */}
+                                        {traditionalSuggestions.map(disease => (
+                                            <Card
+                                                key={disease.id}
+                                                sx={{
+                                                    mb: 1,
+                                                    cursor: 'pointer',
+                                                    bgcolor: 'background.paper',
+                                                    border: '2px solid',
+                                                    borderColor: 'success.light',
+                                                    transition: 'all 0.3s ease',
+                                                    '&:hover': {
+                                                        bgcolor: 'action.hover',
+                                                        borderColor: 'success.main',
+                                                        transform: 'translateY(-2px)',
+                                                        boxShadow: 6
+                                                    }
+                                                }}
+                                                onClick={() => handleTraditionalDiseaseSelect(disease)}
+                                            >
+                                                <CardContent sx={{ py: 2 }}>
+                                                    <Typography variant="h6" sx={{ color: 'success.main', fontWeight: 'bold' }}>
+                                                        {disease.sanskritName} ({disease.englishName})
+                                                    </Typography>
+                                                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                                                        Category: {disease.category} | System: {disease.system}
+                                                    </Typography>
+                                                    <Box sx={{ display: 'flex', gap: 1, mt: 1, flexWrap: 'wrap' }}>
+                                                        <Chip
+                                                            label={`NAMASTE: ${disease.namasteCode}`}
+                                                            size="small"
+                                                            color="warning"
+                                                            variant="filled"
+                                                        />
+                                                        <Chip
+                                                            label={`ICD-11: ${disease.icd11Code}`}
+                                                            size="small"
+                                                            color="primary"
+                                                            variant="outlined"
+                                                        />
+                                                        <Chip
+                                                            label={`Modern: ${disease.modernEquivalent}`}
+                                                            size="small"
+                                                            color="default"
+                                                            variant="outlined"
+                                                        />
+                                                    </Box>
+                                                </CardContent>
+                                            </Card>
+                                        ))}
+
+                                    </Box>
+                                )}
+                            </Box>
+                        )}
+                    </CardContent>
+                </Card>
+            </Grid>
+
+            {/* Modern medicine search */}
             <Grid item xs={12} md={8}>
                 <Box sx={{ position: 'relative' }}>
                     <TextField
@@ -702,108 +832,33 @@ export const DiagnosisCoding = ({ diagnosisData, setDiagnosisData }) => {
                         label="Search for Disease or Condition"
                         placeholder="Type disease name, symptoms, or medical codes..."
                         value={diseaseSearchTerm}
-                        onChange={handleSearchChange}
+                        onChange={(e) => setDiseaseSearchTerm(e.target.value)}
                         InputProps={{
-                            startAdornment: <Search sx={{ mr: 1, color: 'text.secondary' }} />,
-                            endAdornment: diseaseSearchTerm && (
-                                <Button size="small" onClick={clearSearch}>
-                                    Clear
-                                </Button>
-                            )
+                            startAdornment: <Search sx={{ mr: 1, color: 'text.secondary' }} />
                         }}
                         sx={{ mb: 2 }}
                     />
 
-                    {/* Search Results Dropdown */}
+                    {/* Search results dropdown */}
                     {showSuggestions && filteredDiseases.length > 0 && (
-                        <Paper sx={{
-                            position: 'absolute',
-                            top: '100%',
-                            left: 0,
-                            right: 0,
-                            zIndex: 1000,
-                            maxHeight: '400px',
-                            overflow: 'auto',
-                            border: '1px solid',
-                            borderColor: 'primary.main'
-                        }}>
+                        <Paper sx={{ position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 1000, maxHeight: '400px', overflow: 'auto' }}>
                             {filteredDiseases.map((disease) => {
-                                if (!disease || !disease.id) return null;
-
-                                const isAlreadySelected = selectedDiseases.some(d => d && d.id === disease.id);
+                                if (!disease?.id) return null;
+                                const isSelected = selectedDiseases.some(d => d?.id === disease.id);
 
                                 return (
-                                    <Card
-                                        key={disease.id}
-                                        sx={{
-                                            m: 1,
-                                            cursor: isAlreadySelected ? 'not-allowed' : 'pointer',
-                                            opacity: isAlreadySelected ? 0.6 : 1,
-                                            border: isAlreadySelected ? '1px solid' : 'none',
-                                            borderColor: isAlreadySelected ? 'success.main' : 'transparent',
-                                            '&:hover': {
-                                                backgroundColor: isAlreadySelected ? 'inherit' : 'action.hover'
-                                            }
-                                        }}
-                                        onClick={() => {
-                                            if (!isAlreadySelected) {
-                                                handleDiseaseSelection(disease);
-                                            }
-                                        }}
-                                    >
+                                    <Card key={disease.id} sx={{ m: 1, cursor: 'pointer', opacity: isSelected ? 0.6 : 1 }}
+                                        onClick={() => !isSelected && handleDiseaseSelection(disease)}>
                                         <CardContent sx={{ py: 2 }}>
-                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                                                <Box sx={{ flex: 1 }}>
-                                                    <Typography variant="h6" gutterBottom>
-                                                        {disease.name || 'Unknown Disease'} {isAlreadySelected && '✓ Selected'}
-                                                    </Typography>
-                                                    <Typography variant="body2" color="text.secondary" paragraph>
-                                                        {disease.description || 'No description available'}
-                                                    </Typography>
-
-                                                    <Box sx={{ mb: 2 }}>
-                                                        <Chip
-                                                            label={`ICD-11: ${disease.icd11Code || 'N/A'}`}
-                                                            size="small"
-                                                            color="primary"
-                                                            sx={{ mr: 1, mb: 1 }}
-                                                        />
-                                                        <Chip
-                                                            label={`ICD-11 T2: ${disease.icd11T2Code || 'N/A'}`}
-                                                            size="small"
-                                                            color="secondary"
-                                                            sx={{ mr: 1, mb: 1 }}
-                                                        />
-                                                        <Chip
-                                                            label={`NAMASTE: ${disease.namasteCode || 'N/A'}`}
-                                                            size="small"
-                                                            color="success"
-                                                            sx={{ mb: 1 }}
-                                                        />
-                                                    </Box>
-
-                                                    <Typography variant="caption" color="text.secondary">
-                                                        <strong>Category:</strong> {disease.category || 'N/A'} | {' '}
-                                                        <strong>Symptoms:</strong> {
-                                                            Array.isArray(disease.commonSymptoms)
-                                                                ? disease.commonSymptoms.join(', ')
-                                                                : 'N/A'
-                                                        }
-                                                    </Typography>
-                                                </Box>
-
-                                                {!isAlreadySelected && (
-                                                    <Button
-                                                        variant="outlined"
-                                                        size="small"
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            handleDiseaseSelection(disease);
-                                                        }}
-                                                    >
-                                                        Add Diagnosis
-                                                    </Button>
-                                                )}
+                                            <Typography variant="h6">
+                                                {disease.name} {isSelected && '✓ Selected'}
+                                            </Typography>
+                                            <Typography variant="body2" color="text.secondary">
+                                                {disease.description}
+                                            </Typography>
+                                            <Box sx={{ mt: 1 }}>
+                                                <Chip label={`ICD-11: ${disease.icd11Code}`} size="small" sx={{ mr: 1 }} />
+                                                <Chip label={`NAMASTE: ${disease.namasteCode}`} size="small" />
                                             </Box>
                                         </CardContent>
                                     </Card>
@@ -811,42 +866,166 @@ export const DiagnosisCoding = ({ diagnosisData, setDiagnosisData }) => {
                             })}
                         </Paper>
                     )}
-
-                    {/* No Results Message */}
-                    {showSuggestions && filteredDiseases.length === 0 && diseaseSearchTerm.length >= 2 && (
-                        <Paper sx={{ position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 1000, p: 2 }}>
-                            <Typography variant="body2" color="text.secondary" textAlign="center">
-                                No diseases found matching "{diseaseSearchTerm}". Try different keywords.
-                            </Typography>
-                        </Paper>
-                    )}
                 </Box>
             </Grid>
 
-            {/* Search Tips */}
-            <Grid item xs={12} md={4}>
-                <Card sx={{ backgroundColor: 'info.50' }}>
-                    <CardContent>
-                        <Typography variant="subtitle2" gutterBottom>
-                            💡 Search Tips:
-                        </Typography>
-                        <Typography variant="body2" sx={{ mb: 1 }}>
-                            • Disease names: "diabetes", "hypertension"
-                        </Typography>
-                        <Typography variant="body2" sx={{ mb: 1 }}>
-                            • Symptoms: "headache", "chest pain"
-                        </Typography>
-                        <Typography variant="body2" sx={{ mb: 1 }}>
-                            • Medical codes: "5A11", "BA00"
-                        </Typography>
-                        <Typography variant="body2">
-                            • Categories: "cardiovascular", "respiratory"
-                        </Typography>
-                    </CardContent>
-                </Card>
-            </Grid>
+            {/* Dual Coded Results */}
+            {dualCodedDiagnoses.length > 0 && (
+                <Grid item xs={12}>
+                    <Card sx={{
+                        bgcolor: 'background.paper',
+                        border: '3px solid',
+                        borderColor: 'success.main',
+                        borderRadius: 2,
+                        boxShadow: 8
+                    }}>
+                        <CardContent>
+                            <Box sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                mb: 3,
+                                p: 2,
+                                bgcolor: 'success.50',
+                                borderRadius: 1,
+                                border: '1px solid',
+                                borderColor: 'success.main'
+                            }}>
+                                <Typography variant="h5" sx={{
+                                    color: 'success.main',
+                                    fontWeight: 'bold',
+                                    display: 'flex',
+                                    alignItems: 'center'
+                                }}>
+                                    Dual Coded Diagnoses ({dualCodedDiagnoses.length})
+                                </Typography>
+                            </Box>
 
-            {/* Selected Diagnoses */}
+                            {dualCodedDiagnoses.map(diagnosis => (
+                                <Card key={diagnosis.id} sx={{
+                                    mb: 3,
+                                    bgcolor: 'background.paper',
+                                    border: '2px solid',
+                                    borderColor: 'divider',
+                                    borderRadius: 2,
+                                    boxShadow: 4
+                                }}>
+                                    <CardContent sx={{ p: 3 }}>
+                                        <Grid container spacing={3}>
+                                            {/* Traditional Section - Dark Mode Compatible */}
+                                            <Grid item xs={12} md={4}>
+                                                <Box sx={{
+                                                    p: 2,
+                                                    bgcolor: 'warning.50',
+                                                    borderRadius: 1,
+                                                    border: '2px solid',
+                                                    borderColor: 'warning.main'
+                                                }}>
+                                                    <Typography variant="subtitle1" sx={{
+                                                        color: 'warning.main',
+                                                        fontWeight: 'bold',
+                                                        mb: 1
+                                                    }}>
+                                                        Traditional (NAMASTE)
+                                                    </Typography>
+                                                    <Typography variant="h6" sx={{ color: 'text.primary', fontWeight: 'bold' }}>
+                                                        {diagnosis.traditional.sanskritName}
+                                                    </Typography>
+                                                    <Typography variant="body2" color="text.secondary">
+                                                        {diagnosis.traditional.englishName}
+                                                    </Typography>
+                                                    <Chip
+                                                        label={diagnosis.traditional.namasteCode}
+                                                        size="small"
+                                                        color="warning"
+                                                        sx={{ mt: 1 }}
+                                                    />
+                                                </Box>
+                                            </Grid>
+
+                                            {/* TM2 Section - Dark Mode Compatible */}
+                                            <Grid item xs={12} md={4}>
+                                                <Box sx={{
+                                                    p: 2,
+                                                    bgcolor: 'secondary.50',
+                                                    borderRadius: 1,
+                                                    border: '2px solid',
+                                                    borderColor: 'secondary.main'
+                                                }}>
+                                                    <Typography variant="subtitle1" sx={{
+                                                        color: 'secondary.main',
+                                                        fontWeight: 'bold',
+                                                        mb: 1
+                                                    }}>
+                                                        ICD-11 TM2
+                                                    </Typography>
+                                                    <Typography variant="h6" sx={{ color: 'text.primary', fontWeight: 'bold' }}>
+                                                        {diagnosis.tm2.tm2Name}
+                                                    </Typography>
+                                                    <Chip
+                                                        label={diagnosis.tm2.icd11TM2Code}
+                                                        size="small"
+                                                        color="secondary"
+                                                        sx={{ mt: 1 }}
+                                                    />
+                                                </Box>
+                                            </Grid>
+
+                                            {/* Modern Section - Dark Mode Compatible */}
+                                            <Grid item xs={12} md={4}>
+                                                <Box sx={{
+                                                    p: 2,
+                                                    bgcolor: 'success.50',
+                                                    borderRadius: 1,
+                                                    border: '2px solid',
+                                                    borderColor: 'success.main'
+                                                }}>
+                                                    <Typography variant="subtitle1" sx={{
+                                                        color: 'success.main',
+                                                        fontWeight: 'bold',
+                                                        mb: 1
+                                                    }}>
+                                                        Modern (ICD-11)
+                                                    </Typography>
+                                                    <Typography variant="h6" sx={{ color: 'text.primary', fontWeight: 'bold' }}>
+                                                        {diagnosis.modern.modernName}
+                                                    </Typography>
+                                                    <Chip
+                                                        label={diagnosis.modern.icd11Code}
+                                                        size="small"
+                                                        color="success"
+                                                        sx={{ mt: 1 }}
+                                                    />
+                                                </Box>
+                                            </Grid>
+                                        </Grid>
+
+                                        {/* Success Alert - Dark Mode Compatible */}
+                                        <Alert severity="success" sx={{
+                                            mt: 3,
+                                            bgcolor: 'success.50',
+                                            border: '1px solid',
+                                            borderColor: 'success.main',
+                                            '& .MuiAlert-icon': {
+                                                color: 'success.main'
+                                            }
+                                        }}>
+                                            <Typography variant="body1" sx={{ fontWeight: 'bold', color: 'success.main' }}>
+                                                Triple Coded Successfully: NAMASTE + ICD-11 TM2 + ICD-11 Biomedicine
+                                            </Typography>
+                                            <Typography variant="body2" sx={{ color: 'text.secondary', mt: 1 }}>
+                                                Ready for government reporting, insurance claims, and international interoperability
+                                            </Typography>
+                                        </Alert>
+                                    </CardContent>
+                                </Card>
+                            ))}
+                        </CardContent>
+                    </Card>
+
+                </Grid>
+            )}
+
+            {/* Selected diagnoses display */}
             {selectedDiseases.length > 0 && (
                 <Grid item xs={12}>
                     <Divider sx={{ my: 2 }} />
@@ -855,15 +1034,33 @@ export const DiagnosisCoding = ({ diagnosisData, setDiagnosisData }) => {
                     </Typography>
 
                     {selectedDiseases.map((disease) => {
-                        if (!disease || !disease.id) return null;
-
+                        if (!disease?.id) return null;
                         return (
-                            <Card key={disease.id} sx={{ mb: 2, border: '2px solid', borderColor: 'success.main', backgroundColor: 'success.50' }}>
+                            <Card key={disease.id} sx={{
+                                mb: 2,
+                                border: '2px solid',
+                                borderColor: 'success.main',
+                                backgroundColor: 'background.paper',
+                                boxShadow: 4,
+                                '&:hover': {
+                                    boxShadow: 8,
+                                    transform: 'translateY(-1px)',
+                                    transition: 'all 0.3s ease'
+                                }
+                            }}>
                                 <CardContent>
                                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                         <Box sx={{ flex: 1 }}>
-                                            <Typography variant="h6" gutterBottom>
+                                            <Typography variant="h6" color="text.primary">
                                                 {disease.name || 'Unknown Disease'}
+                                                {disease.isDualCoded && (
+                                                    <Chip
+                                                        label=" Dual Coded"
+                                                        size="small"
+                                                        color="success"
+                                                        sx={{ ml: 1 }}
+                                                    />
+                                                )}
                                             </Typography>
                                             <Typography variant="body2" color="text.secondary" paragraph>
                                                 {disease.description || 'No description available'}
@@ -888,26 +1085,7 @@ export const DiagnosisCoding = ({ diagnosisData, setDiagnosisData }) => {
                                                     color="success"
                                                 />
                                             </Box>
-
-                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                                <FormControl size="small" sx={{ minWidth: 120 }}>
-                                                    <InputLabel>Severity</InputLabel>
-                                                    <Select
-                                                        value={disease.severity || 'Moderate'}
-                                                        onChange={(e) => updateDiseaseSeverity(disease.id, e.target.value)}
-                                                    >
-                                                        {(Array.isArray(disease.severity) ? disease.severity : ['Mild', 'Moderate', 'Severe']).map(sev => (
-                                                            <MenuItem key={sev} value={sev}>{sev}</MenuItem>
-                                                        ))}
-                                                    </Select>
-                                                </FormControl>
-
-                                                <Typography variant="body2" color="text.secondary">
-                                                    <strong>Category:</strong> {disease.category || 'N/A'}
-                                                </Typography>
-                                            </Box>
                                         </Box>
-
                                         <Button
                                             variant="outlined"
                                             color="error"
@@ -933,16 +1111,7 @@ export const DiagnosisCoding = ({ diagnosisData, setDiagnosisData }) => {
                     multiline
                     rows={4}
                     value={diagnosisData?.clinicalNotes || ''}
-                    onChange={(e) => {
-                        try {
-                            setDiagnosisData({
-                                ...diagnosisData,
-                                clinicalNotes: e.target.value
-                            });
-                        } catch (error) {
-                            console.error('Error updating clinical notes:', error);
-                        }
-                    }}
+                    onChange={(e) => setDiagnosisData({ ...diagnosisData, clinicalNotes: e.target.value })}
                     placeholder="Additional clinical observations and notes..."
                 />
             </Grid>
@@ -954,36 +1123,14 @@ export const DiagnosisCoding = ({ diagnosisData, setDiagnosisData }) => {
                     multiline
                     rows={4}
                     value={diagnosisData?.treatmentPlan || ''}
-                    onChange={(e) => {
-                        try {
-                            setDiagnosisData({
-                                ...diagnosisData,
-                                treatmentPlan: e.target.value
-                            });
-                        } catch (error) {
-                            console.error('Error updating treatment plan:', error);
-                        }
-                    }}
+                    onChange={(e) => setDiagnosisData({ ...diagnosisData, treatmentPlan: e.target.value })}
                     placeholder="Recommended treatment and follow-up plan..."
                 />
-            </Grid>
-
-            {/* Available Diseases Summary */}
-            <Grid item xs={12}>
-                <Card sx={{ backgroundColor: 'grey.50' }}>
-                    <CardContent>
-                        <Typography variant="subtitle2" gutterBottom>
-                            Available Conditions in Database ({mockDiseases.length}):
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                            {mockDiseases.map(disease => disease.name).join(' • ')}
-                        </Typography>
-                    </CardContent>
-                </Card>
             </Grid>
         </Grid>
     );
 };
+
 // Consent Review Step
 export const ConsentReview = ({ selectedPatient, encounterData, diagnosisData, consentData, setConsentData, otpData, historyReviewed }) => {
     return (

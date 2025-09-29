@@ -178,10 +178,10 @@ const DiagnosisHistory = () => {
   const initializeDiagnosisHistory = () => {
     try {
       setLoading(true);
-      
+
       // Get existing history from localStorage
       const existingHistory = JSON.parse(localStorage.getItem('diagnosisHistory') || '[]');
-      
+
       // If no existing history, populate with initial data
       if (existingHistory.length === 0) {
         localStorage.setItem('diagnosisHistory', JSON.stringify(initialDiagnosisHistory));
@@ -193,12 +193,12 @@ const DiagnosisHistory = () => {
         const uniqueRecords = allRecords.filter((record, index, self) =>
           index === self.findIndex(r => r.id === record.id)
         );
-        
+
         // Sort by creation date (newest first)
-        const sortedHistory = uniqueRecords.sort((a, b) => 
+        const sortedHistory = uniqueRecords.sort((a, b) =>
           new Date(b.createdAt) - new Date(a.createdAt)
         );
-        
+
         setDiagnosisHistory(sortedHistory);
         // Update localStorage with merged data
         localStorage.setItem('diagnosisHistory', JSON.stringify(sortedHistory));
@@ -214,14 +214,14 @@ const DiagnosisHistory = () => {
   const loadDiagnosisHistory = (showLoading = true) => {
     try {
       if (showLoading) setRefreshing(true);
-      
+
       const history = JSON.parse(localStorage.getItem('diagnosisHistory') || '[]');
-      
+
       // Sort by creation date (newest first)
-      const sortedHistory = history.sort((a, b) => 
+      const sortedHistory = history.sort((a, b) =>
         new Date(b.createdAt) - new Date(a.createdAt)
       );
-      
+
       setDiagnosisHistory(sortedHistory);
     } catch (error) {
       console.error('Error loading diagnosis history:', error);
@@ -242,7 +242,7 @@ const DiagnosisHistory = () => {
           record.patientAbhaId?.toLowerCase().includes(searchLower) ||
           record.chiefComplaint?.toLowerCase().includes(searchLower) ||
           record.practitioner?.toLowerCase().includes(searchLower) ||
-          record.diagnoses?.some(diag => 
+          record.diagnoses?.some(diag =>
             diag.name?.toLowerCase().includes(searchLower)
           )
         );
@@ -250,26 +250,26 @@ const DiagnosisHistory = () => {
 
       // Date range filter
       if (filters.dateFrom) {
-        filtered = filtered.filter(record => 
+        filtered = filtered.filter(record =>
           new Date(record.encounterDate) >= filters.dateFrom
         );
       }
       if (filters.dateTo) {
-        filtered = filtered.filter(record => 
+        filtered = filtered.filter(record =>
           new Date(record.encounterDate) <= filters.dateTo
         );
       }
 
       // Status filter
       if (filters.status !== 'all') {
-        filtered = filtered.filter(record => 
+        filtered = filtered.filter(record =>
           record.status?.toLowerCase() === filters.status.toLowerCase()
         );
       }
 
       // Practitioner filter
       if (filters.practitioner !== 'all') {
-        filtered = filtered.filter(record => 
+        filtered = filtered.filter(record =>
           record.practitioner === filters.practitioner
         );
       }
@@ -360,10 +360,10 @@ const DiagnosisHistory = () => {
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <Box sx={{ maxWidth: 1400, mx: 'auto', p: 3 }}>
         {/* Header - Updated with subtle gradient */}
-        <Paper sx={{ 
-          p: 3, 
-          mb: 3, 
-          background: (theme) => theme.palette.mode === 'dark' 
+        <Paper sx={{
+          p: 3,
+          mb: 3,
+          background: (theme) => theme.palette.mode === 'dark'
             ? 'linear-gradient(135deg, #2c3e50 0%, #34495e 100%)'
             : 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
           color: (theme) => theme.palette.mode === 'dark' ? 'white' : 'inherit',
@@ -396,8 +396,8 @@ const DiagnosisHistory = () => {
         {/* Statistics Cards - Subtle, Dark Mode Compatible */}
         <Grid container spacing={3} sx={{ mb: 3 }}>
           <Grid item xs={12} md={3}>
-            <Card sx={{ 
-              background: (theme) => theme.palette.mode === 'dark' 
+            <Card sx={{
+              background: (theme) => theme.palette.mode === 'dark'
                 ? 'linear-gradient(135deg, #4a5568 0%, #2d3748 100%)'
                 : 'linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%)',
               color: (theme) => theme.palette.mode === 'dark' ? '#e2e8f0' : '#2d3748',
@@ -412,8 +412,8 @@ const DiagnosisHistory = () => {
             </Card>
           </Grid>
           <Grid item xs={12} md={3}>
-            <Card sx={{ 
-              background: (theme) => theme.palette.mode === 'dark' 
+            <Card sx={{
+              background: (theme) => theme.palette.mode === 'dark'
                 ? 'linear-gradient(135deg, #2b6cb9 0%, #1e4a73 100%)'
                 : 'linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)',
               color: (theme) => theme.palette.mode === 'dark' ? '#dbeafe' : '#1e40af',
@@ -430,8 +430,8 @@ const DiagnosisHistory = () => {
             </Card>
           </Grid>
           <Grid item xs={12} md={3}>
-            <Card sx={{ 
-              background: (theme) => theme.palette.mode === 'dark' 
+            <Card sx={{
+              background: (theme) => theme.palette.mode === 'dark'
                 ? 'linear-gradient(135deg, #38a169 0%, #2f855a 100%)'
                 : 'linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)',
               color: (theme) => theme.palette.mode === 'dark' ? '#d1fae5' : '#065f46',
@@ -446,8 +446,8 @@ const DiagnosisHistory = () => {
             </Card>
           </Grid>
           <Grid item xs={12} md={3}>
-            <Card sx={{ 
-              background: (theme) => theme.palette.mode === 'dark' 
+            <Card sx={{
+              background: (theme) => theme.palette.mode === 'dark'
                 ? 'linear-gradient(135deg, #d69e2e 0%, #b7791f 100%)'
                 : 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
               color: (theme) => theme.palette.mode === 'dark' ? '#fef3c7' : '#92400e',
@@ -575,8 +575,8 @@ const DiagnosisHistory = () => {
                 No diagnosis records found
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                {searchTerm || filters.dateFrom || filters.status !== 'all' 
-                  ? 'Try adjusting your search criteria' 
+                {searchTerm || filters.dateFrom || filters.status !== 'all'
+                  ? 'Try adjusting your search criteria'
                   : 'Start by creating your first diagnosis record'
                 }
               </Typography>
@@ -585,47 +585,47 @@ const DiagnosisHistory = () => {
             <TableContainer>
               <Table>
                 <TableHead>
-                  <TableRow sx={{ 
+                  <TableRow sx={{
                     backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'grey.800' : 'grey.50'
                   }}>
                     <TableCell width="50px"></TableCell>
-                    <TableCell sx={{ 
+                    <TableCell sx={{
                       fontWeight: 'bold',
                       color: (theme) => theme.palette.mode === 'dark' ? 'grey.100' : 'grey.900'
                     }}>
                       Date
                     </TableCell>
-                    <TableCell sx={{ 
+                    <TableCell sx={{
                       fontWeight: 'bold',
                       color: (theme) => theme.palette.mode === 'dark' ? 'grey.100' : 'grey.900'
                     }}>
                       Patient Info
                     </TableCell>
-                    <TableCell sx={{ 
+                    <TableCell sx={{
                       fontWeight: 'bold',
                       color: (theme) => theme.palette.mode === 'dark' ? 'grey.100' : 'grey.900'
                     }}>
                       Chief Complaint
                     </TableCell>
-                    <TableCell sx={{ 
+                    <TableCell sx={{
                       fontWeight: 'bold',
                       color: (theme) => theme.palette.mode === 'dark' ? 'grey.100' : 'grey.900'
                     }}>
                       Diagnoses
                     </TableCell>
-                    <TableCell sx={{ 
+                    <TableCell sx={{
                       fontWeight: 'bold',
                       color: (theme) => theme.palette.mode === 'dark' ? 'grey.100' : 'grey.900'
                     }}>
                       Practitioner
                     </TableCell>
-                    <TableCell sx={{ 
+                    <TableCell sx={{
                       fontWeight: 'bold',
                       color: (theme) => theme.palette.mode === 'dark' ? 'grey.100' : 'grey.900'
                     }}>
                       Status
                     </TableCell>
-                    <TableCell sx={{ 
+                    <TableCell sx={{
                       fontWeight: 'bold',
                       color: (theme) => theme.palette.mode === 'dark' ? 'grey.100' : 'grey.900'
                     }}>
@@ -636,10 +636,10 @@ const DiagnosisHistory = () => {
                 <TableBody>
                   {currentRecords.map((record) => (
                     <React.Fragment key={record.id}>
-                      <TableRow hover sx={{ 
-                        '&:hover': { 
+                      <TableRow hover sx={{
+                        '&:hover': {
                           backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'grey.800' : 'action.hover'
-                        } 
+                        }
                       }}>
                         <TableCell>
                           <IconButton
@@ -676,7 +676,7 @@ const DiagnosisHistory = () => {
                         </TableCell>
                         <TableCell>
                           <Typography variant="body2" sx={{ maxWidth: 200 }}>
-                            {record.chiefComplaint?.length > 50 
+                            {record.chiefComplaint?.length > 50
                               ? `${record.chiefComplaint.substring(0, 50)}...`
                               : record.chiefComplaint
                             }
@@ -838,15 +838,15 @@ const DiagnosisHistory = () => {
                       <Typography><strong>ABHA ID:</strong> {selectedRecord.patientAbhaId}</Typography>
                       <Typography><strong>Encounter Date:</strong> {new Date(selectedRecord.encounterDate).toLocaleDateString()}</Typography>
                       <Typography><strong>Practitioner:</strong> {selectedRecord.practitioner}</Typography>
-                      <Chip 
-                        label={selectedRecord.status} 
-                        color={getStatusColor(selectedRecord.status)} 
-                        sx={{ mt: 1 }} 
+                      <Chip
+                        label={selectedRecord.status}
+                        color={getStatusColor(selectedRecord.status)}
+                        sx={{ mt: 1 }}
                       />
                     </CardContent>
                   </Card>
                 </Grid>
-                
+
                 <Grid item xs={12} md={6}>
                   <Card variant="outlined" sx={{ borderRadius: 2 }}>
                     <CardContent>
@@ -959,22 +959,22 @@ const DiagnosisHistory = () => {
                       <Grid container spacing={2}>
                         <Grid item xs={6}>
                           <Typography variant="body2">
-                            <strong>OTP Verified:</strong> {selectedRecord.otpVerified ? '✅ Yes' : '❌ No'}
+                            <strong>OTP Verified:</strong> {selectedRecord.otpVerified ? ' Yes' : ' No'}
                           </Typography>
                         </Grid>
                         <Grid item xs={6}>
                           <Typography variant="body2">
-                            <strong>History Reviewed:</strong> {selectedRecord.historyReviewed ? '✅ Yes' : '❌ No'}
+                            <strong>History Reviewed:</strong> {selectedRecord.historyReviewed ? ' Yes' : ' No'}
                           </Typography>
                         </Grid>
                         <Grid item xs={6}>
                           <Typography variant="body2">
-                            <strong>Data Sharing Consent:</strong> {selectedRecord.consentData?.dataSharing ? '✅ Yes' : '❌ No'}
+                            <strong>Data Sharing Consent:</strong> {selectedRecord.consentData?.dataSharing ? ' Yes' : ' No'}
                           </Typography>
                         </Grid>
                         <Grid item xs={6}>
                           <Typography variant="body2">
-                            <strong>Research Consent:</strong> {selectedRecord.consentData?.research ? '✅ Yes' : '❌ No'}
+                            <strong>Research Consent:</strong> {selectedRecord.consentData?.research ? ' Yes' : ' No'}
                           </Typography>
                         </Grid>
                         <Grid item xs={12}>
@@ -991,8 +991,8 @@ const DiagnosisHistory = () => {
           </DialogContent>
           <DialogActions>
             <Button onClick={() => setDetailsDialog(false)}>Close</Button>
-            <Button 
-              variant="contained" 
+            <Button
+              variant="contained"
               startIcon={<Print />}
               onClick={() => window.print()}
             >
