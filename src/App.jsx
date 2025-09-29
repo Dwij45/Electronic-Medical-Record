@@ -26,6 +26,7 @@ import Analytics from './pages/Analytics';
 import Settings from './pages/Settings';
 import Profile from './pages/Profile';
 import Terminology from './pages/Terminology';
+import MedicalCodingMapping from './pages/MedicalCodingMapping';
 
 const App = () => {
   return (
@@ -93,6 +94,7 @@ const MainContent = () => {
         <Route path="/analytics" element={<Analytics />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/medical-coding-mapping" element={<MedicalCodingMapping />} />
       </Routes>
     </Box>
   );

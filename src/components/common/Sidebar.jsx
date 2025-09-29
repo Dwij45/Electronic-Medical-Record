@@ -25,6 +25,8 @@ import {
   LocalHospital as HospitalIcon,
   ChevronLeft as ChevronLeftIcon,
   ChevronRight as ChevronRightIcon,
+  Code as Code,
+  Book as Book,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useSidebar } from '../../context/SidebarContext';
@@ -36,8 +38,13 @@ const MINI_DRAWER_WIDTH = 64;
 const menuItems = [
   { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
   { text: 'New Diagnosis', icon: <AssignmentIcon />, path: '/diagnosis/new' },
+  {
+    text: 'Medical Coding Mapping',
+    icon: <Code />, // Make sure to import Code from @mui/icons-material
+    path: '/medical-coding-mapping'
+  },
   { text: 'Diagnosis History', icon: <HistoryIcon />, path: '/diagnosis/history' },
-  { text: 'Terminology', icon: <CodeIcon />, path: '/terminology' },
+  { text: 'Terminology', icon: <Book />, path: '/terminology' },
   { text: 'Analytics', icon: <AnalyticsIcon />, path: '/analytics' },
 ];
 
