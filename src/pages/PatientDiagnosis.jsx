@@ -1,117 +1,92 @@
-// pages/PatientDiagnosis.js
-import React, { useState, useEffect } from 'react';
-import {
-  Box,
-  Paper,
-  Typography,
-  Grid,
-  TextField,
-  Button,
-  Card,
-  CardContent,
-  Autocomplete,
-  Stepper,
-  Step,
-  StepLabel,
-  Alert,
-  Checkbox,
-  FormControlLabel,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  CircularProgress,
-} from '@mui/material';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import React, { useState } from 'react';
+import { Box, Paper, Typography, Stepper, Step, StepLabel, Button, Alert } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import DualCodingWidget from '../components/terminology/DualCodingWidget';
-import ConsentManager from '../components/diagnosis/ConsentManager';
-import { useAuth } from '../context/AuthContext';
-import diagnosisService from '../services/diagnosis.service';
-import fhirService from '../services/fhir.service';
+
+import {
+  PatientSelection, OTPVerification, MedicalHistoryReview, ClinicalAssessment,
+  DiagnosisCoding, ConsentReview, SubmissionSuccess
+} from '../components/diagnosis/DiagnosisSteps';
+import ConfirmationDialog from '../components/diagnosis/ConfirmationDialog';
 
 const PatientDiagnosis = () => {
-  const { user } = useAuth();
   const [activeStep, setActiveStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
 
   // Form state
-  const [patientData, setPatientData] = useState({
-    id: '',
-    name: '',
-    abhaId: '',
-    dateOfBirth: null,
-    gender: '',
-    contactNumber: '',
+  const [selectedPatient, setSelectedPatient] = useState(null);
+  const [otpData, setOtpData] = useState({
+    otpSent: false,
+    otpCode: '',
+    enteredOtp: '',
+    verified: false,
+    timeRemaining: 0
   });
-
+  const [historyReviewed, setHistoryReviewed] = useState(false);
   const [encounterData, setEncounterData] = useState({
     date: new Date(),
     type: 'outpatient',
-    location: '',
-    practitioner: user?.name || '',
+    location: 'General Medicine OPD',
+    practitioner: 'Dr. Sarah Wilson',
+    chiefComplaint: '',
+    vitalSigns: {
+      temperature: '',
+      bloodPressure: '',
+      heartRate: '',
+      respiratoryRate: '',
+      oxygenSaturation: ''
+    }
   });
-
   const [diagnosisData, setDiagnosisData] = useState({
-    codes: [],
-    notes: '',
-    severity: 'moderate',
-    onset: null,
-    status: 'active',
+    selectedDiseases: [],
+    clinicalNotes: '',
+    treatmentPlan: '',
+    followUpDate: null
   });
-
   const [consentData, setConsentData] = useState({
     dataSharing: false,
     research: false,
     analytics: false,
+    publicHealth: false,
     consentGiven: false,
-    consentDate: null,
+    patientSignature: '',
+    consentDate: new Date()
   });
-
   const [confirmDialog, setConfirmDialog] = useState(false);
+  const [submittedDiagnosis, setSubmittedDiagnosis] = useState(null);
 
   const steps = [
     'Patient Information',
-    'Diagnosis Coding',
-    'Consent & Review',
-    'Submit'
+    'OTP Verification',
+    'Medical History Review',
+    'Clinical Assessment',
+    'Diagnosis & Coding',
+    'Consent & Review'
   ];
-
-  const handlePatientSearch = async (searchTerm) => {
-    // Implementation for patient search
-    // This would connect to your patient registry API
-    try {
-      const results = await diagnosisService.searchPatients(searchTerm);
-      return results;
-    } catch (err) {
-      console.error('Patient search error:', err);
-      return [];
-    }
-  };
 
   const handleNext = () => {
     if (validateCurrentStep()) {
       setActiveStep((prev) => prev + 1);
+      setError(null);
     }
   };
 
   const handleBack = () => {
     setActiveStep((prev) => prev - 1);
+    setError(null);
   };
 
   const validateCurrentStep = () => {
     switch (activeStep) {
-      case 0:
-        return patientData.id && patientData.name && patientData.abhaId;
-      case 1:
-        return diagnosisData.codes.length > 0;
-      case 2:
-        return consentData.consentGiven;
-      default:
-        return true;
+      case 0: return selectedPatient !== null;
+      case 1: return otpData.verified;
+      case 2: return historyReviewed;
+      case 3: return encounterData.chiefComplaint.trim() !== '';
+      case 4: return diagnosisData.selectedDiseases.length > 0;
+      case 5: return consentData.consentGiven;
+      default: return true;
     }
   };
 
@@ -120,20 +95,34 @@ const PatientDiagnosis = () => {
     setError(null);
 
     try {
-      // Create FHIR Bundle
-      const fhirBundle = await fhirService.createDiagnosisBundle({
-        patient: patientData,
-        encounter: encounterData,
-        diagnosis: diagnosisData,
-        consent: consentData,
-        practitioner: user,
-      });
+      await new Promise(resolve => setTimeout(resolve, 2000));
 
-      // Submit to backend
-      const result = await diagnosisService.submitDiagnosis(fhirBundle);
-      
+      const diagnosisRecord = {
+        id: Date.now().toString(),
+        patientId: selectedPatient.id,
+        patientName: selectedPatient.name,
+        patientAbhaId: selectedPatient.abhaId,
+        encounterDate: encounterData.date,
+        practitioner: encounterData.practitioner,
+        chiefComplaint: encounterData.chiefComplaint,
+        vitalSigns: encounterData.vitalSigns,
+        diagnoses: diagnosisData.selectedDiseases,
+        clinicalNotes: diagnosisData.clinicalNotes,
+        treatmentPlan: diagnosisData.treatmentPlan,
+        consentData: consentData,
+        otpVerified: otpData.verified,
+        historyReviewed: historyReviewed,
+        createdAt: new Date(),
+        status: 'Active'
+      };
+
+      const existingHistory = JSON.parse(localStorage.getItem('diagnosisHistory') || '[]');
+      const updatedHistory = [diagnosisRecord, ...existingHistory];
+      localStorage.setItem('diagnosisHistory', JSON.stringify(updatedHistory));
+
+      setSubmittedDiagnosis(diagnosisRecord);
       setSuccess(true);
-      setActiveStep(3);
+      setActiveStep(6);
     } catch (err) {
       setError(err.message || 'Failed to submit diagnosis');
     } finally {
@@ -142,151 +131,85 @@ const PatientDiagnosis = () => {
     }
   };
 
+  const resetForm = () => {
+    setSelectedPatient(null);
+    setOtpData({
+      otpSent: false,
+      otpCode: '',
+      enteredOtp: '',
+      verified: false,
+      timeRemaining: 0
+    });
+    setHistoryReviewed(false);
+    setEncounterData({
+      date: new Date(),
+      type: 'outpatient',
+      location: 'General Medicine OPD',
+      practitioner: 'Dr. Sarah Wilson',
+      chiefComplaint: '',
+      vitalSigns: {
+        temperature: '',
+        bloodPressure: '',
+        heartRate: '',
+        respiratoryRate: '',
+        oxygenSaturation: ''
+      }
+    });
+    setDiagnosisData({
+      selectedDiseases: [],
+      clinicalNotes: '',
+      treatmentPlan: '',
+      followUpDate: null
+    });
+    setConsentData({
+      dataSharing: false,
+      research: false,
+      analytics: false,
+      publicHealth: false,
+      consentGiven: false,
+      patientSignature: '',
+      consentDate: new Date()
+    });
+    setActiveStep(0);
+    setSuccess(false);
+    setError(null);
+  };
+
   const renderStepContent = () => {
+    const commonProps = {
+      selectedPatient,
+      setSelectedPatient,
+      otpData,
+      setOtpData,
+      historyReviewed,
+      setHistoryReviewed,
+      encounterData,
+      setEncounterData,
+      diagnosisData,
+      setDiagnosisData,
+      consentData,
+      setConsentData,
+      loading,
+      setLoading,
+      error,
+      setError
+    };
+
     switch (activeStep) {
       case 0:
-        return (
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <Typography variant="h6" gutterBottom>
-                Patient Information
-              </Typography>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <Autocomplete
-                options={[]} // This would be populated by patient search
-                getOptionLabel={(option) => `${option.name} (${option.abhaId})`}
-                onInputChange={async (event, value) => {
-                  if (value && value.length > 2) {
-                    const results = await handlePatientSearch(value);
-                    // Update options
-                  }
-                }}
-                onChange={(event, value) => {
-                  if (value) {
-                    setPatientData(value);
-                  }
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Search Patient"
-                    placeholder="Enter name or ABHA ID"
-                    fullWidth
-                    required
-                  />
-                )}
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="ABHA ID"
-                value={patientData.abhaId}
-                onChange={(e) => setPatientData({ ...patientData, abhaId: e.target.value })}
-                required
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Full Name"
-                value={patientData.name}
-                onChange={(e) => setPatientData({ ...patientData, name: e.target.value })}
-                required
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <LocalizationProvider dateAdapter={AdapterDateFns}>
-                <DatePicker
-                  label="Date of Birth"
-                  value={patientData.dateOfBirth}
-                  onChange={(date) => setPatientData({ ...patientData, dateOfBirth: date })}
-                  renderInput={(params) => <TextField {...params} fullWidth />}
-                />
-              </LocalizationProvider>
-            </Grid>
-          </Grid>
-        );
-
+        return <PatientSelection {...commonProps} />;
       case 1:
-        return (
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <Typography variant="h6" gutterBottom>
-                Diagnosis Coding
-              </Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <DualCodingWidget
-                selectedCodes={diagnosisData.codes}
-                onSelectionChange={(codes) => setDiagnosisData({ ...diagnosisData, codes })}
-                patientContext={patientData}
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Clinical Notes"
-                multiline
-                rows={4}
-                value={diagnosisData.notes}
-                onChange={(e) => setDiagnosisData({ ...diagnosisData, notes: e.target.value })}
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                select
-                label="Severity"
-                value={diagnosisData.severity}
-                onChange={(e) => setDiagnosisData({ ...diagnosisData, severity: e.target.value })}
-                SelectProps={{ native: true }}
-              >
-                <option value="mild">Mild</option>
-                <option value="moderate">Moderate</option>
-                <option value="severe">Severe</option>
-              </TextField>
-            </Grid>
-          </Grid>
-        );
-
+        return <OTPVerification {...commonProps} />;
       case 2:
-        return (
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <Typography variant="h6" gutterBottom>
-                Consent & Review
-              </Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <ConsentManager
-                consentData={consentData}
-                onConsentChange={setConsentData}
-                patientData={patientData}
-                diagnosisData={diagnosisData}
-              />
-            </Grid>
-          </Grid>
-        );
-
+        return <MedicalHistoryReview {...commonProps} />;
       case 3:
-        return success ? (
-          <Box textAlign="center" py={4}>
-            <Typography variant="h5" color="success.main" gutterBottom>
-              Diagnosis Submitted Successfully!
-            </Typography>
-            <Typography variant="body1" color="text.secondary" paragraph>
-              FHIR Bundle created and submitted with dual coding compliance.
-            </Typography>
-            <Button variant="contained" onClick={() => window.location.reload()}>
-              Create New Diagnosis
-            </Button>
-          </Box>
-        ) : (
-          <Typography>Submitting...</Typography>
-        );
-
+        return <ClinicalAssessment {...commonProps} />;
+      case 4:
+        return <DiagnosisCoding {...commonProps} />;
+      case 5:
+        return <ConsentReview {...commonProps} />;
+      case 6:
+        return <SubmissionSuccess submittedDiagnosis={submittedDiagnosis} resetForm={resetForm} />;
       default:
         return null;
     }
@@ -294,18 +217,21 @@ const PatientDiagnosis = () => {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <Box>
+      <Box sx={{ maxWidth: 1200, mx: 'auto', p: 3 }}>
         <Typography variant="h4" gutterBottom>
-          Patient Diagnosis Entry
+          Enhanced Patient Diagnosis Entry
+        </Typography>
+        <Typography variant="body1" color="text.secondary" paragraph>
+          Complete 6-step diagnosis workflow with OTP authentication, medical history review, and ICD-11/NAMASTE coding
         </Typography>
 
         {error && (
-          <Alert severity="error" sx={{ mb: 3 }}>
+          <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)}>
             {error}
           </Alert>
         )}
 
-        <Paper sx={{ p: 3, mb: 3 }}>
+        <Paper sx={{ p: 3 }}>
           <Stepper activeStep={activeStep} sx={{ mb: 4 }}>
             {steps.map((label) => (
               <Step key={label}>
@@ -316,63 +242,51 @@ const PatientDiagnosis = () => {
 
           {renderStepContent()}
 
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
-            <Button
-              disabled={activeStep === 0}
-              onClick={handleBack}
-              variant="outlined"
-            >
-              Back
-            </Button>
-            
-            {activeStep === steps.length - 2 ? (
+          {activeStep < 6 && (
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
               <Button
-                variant="contained"
-                onClick={() => setConfirmDialog(true)}
-                disabled={!validateCurrentStep()}
+                disabled={activeStep === 0}
+                onClick={handleBack}
+                variant="outlined"
               >
-                Review & Submit
+                Back
               </Button>
-            ) : activeStep < steps.length - 1 ? (
-              <Button
-                variant="contained"
-                onClick={handleNext}
-                disabled={!validateCurrentStep()}
-              >
-                Next
-              </Button>
-            ) : null}
-          </Box>
+
+              {activeStep === steps.length - 1 ? (
+                <Button
+                  variant="contained"
+                  onClick={() => setConfirmDialog(true)}
+                  disabled={!validateCurrentStep()}
+                  size="large"
+                >
+                  Submit Diagnosis
+                </Button>
+              ) : (
+                <Button
+                  variant="contained"
+                  onClick={handleNext}
+                  disabled={!validateCurrentStep()}
+                  size="large"
+                >
+                  Next
+                </Button>
+              )}
+            </Box>
+          )}
         </Paper>
 
-        {/* Confirmation Dialog */}
-        <Dialog open={confirmDialog} onClose={() => setConfirmDialog(false)}>
-          <DialogTitle>Confirm Diagnosis Submission</DialogTitle>
-          <DialogContent>
-            <Typography gutterBottom>
-              Please review the diagnosis information:
-            </Typography>
-            <Typography variant="body2" sx={{ mt: 2 }}>
-              <strong>Patient:</strong> {patientData.name} ({patientData.abhaId})
-            </Typography>
-            <Typography variant="body2">
-              <strong>Codes Selected:</strong> {diagnosisData.codes.length}
-            </Typography>
-            <Typography variant="body2">
-              <strong>Consent Given:</strong> {consentData.consentGiven ? 'Yes' : 'No'}
-            </Typography>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setConfirmDialog(false)}>Cancel</Button>
-            <Button 
-              onClick={handleSubmit} 
-              variant="contained" 
-              disabled={loading}
-            >
-              {loading ? <CircularProgress size={20} /> : 'Submit'}
-            </Button>
-          </DialogActions>
-        </Dialog>
+        <ConfirmationDialog
+          open={confirmDialog}
+          onClose={() => setConfirmDialog(false)}
+          onConfirm={handleSubmit}
+          selectedPatient={selectedPatient}
+          encounterData={encounterData}
+          diagnosisData={diagnosisData}
+          consentData={consentData}
+          otpData={otpData}
+          historyReviewed={historyReviewed}
+          loading={loading}
+        />
       </Box>
     </LocalizationProvider>
   );

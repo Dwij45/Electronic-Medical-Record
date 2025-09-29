@@ -22,10 +22,10 @@ import Login from './components/auth/Login';
 import Dashboard from './pages/Dashboard';
 import PatientDiagnosis from './pages/PatientDiagnosis';
 import DiagnosisHistory from './pages/DiagnosisHistory';
-import TerminologyManagement from './pages/TerminologyManagement';
 import Analytics from './pages/Analytics';
 import Settings from './pages/Settings';
 import Profile from './pages/Profile';
+import Terminology from './pages/Terminology';
 
 const App = () => {
   return (
@@ -89,7 +89,7 @@ const MainContent = () => {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/diagnosis/new" element={<PatientDiagnosis />} />
         <Route path="/diagnosis/history" element={<DiagnosisHistory />} />
-        <Route path="/terminology" element={<TerminologyManagement />} />
+        <Route path="/terminology" element={<Terminology />} />
         <Route path="/analytics" element={<Analytics />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/profile" element={<Profile />} />
