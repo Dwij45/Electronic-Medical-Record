@@ -101,7 +101,7 @@ const DiagnosisHistory = () => {
   const mockDiagnoses = [
     {
       id: '1',
-      patientName: 'John Doe',
+      patientName: 'Rajesh Kumar',
       patientId: 'P001',
       abhaId: '12-3456-7890-1234',
       date: new Date('2023-10-15'),
@@ -115,7 +115,7 @@ const DiagnosisHistory = () => {
     },
     {
       id: '2',
-      patientName: 'Jane Smith',
+      patientName: 'Priya Sharma',
       patientId: 'P002',
       abhaId: '12-3456-7890-5678',
       date: new Date('2023-10-14'),
@@ -126,6 +126,20 @@ const DiagnosisHistory = () => {
       notes: 'Follow-up consultation for gastric issues.',
       status: 'active',
       practitioner: 'Dr. Johnson',
+    },
+    {
+      id: '3',
+      patientName: 'Amit Patel',
+      patientId: 'P003',
+      abhaId: '12-3456-7890-9012',
+      date: new Date('2023-10-13'),
+      codes: [
+        { system: 'NAMASTE', code: 'N-UNA-015', display: 'Pitta Aggravation' },
+        { system: 'ICD-11-TM2', code: 'TM15.05', display: 'Heat Syndrome' },
+      ],
+      notes: 'Patient experiencing inflammatory symptoms and heat-related discomfort.',
+      status: 'active',
+      practitioner: 'Dr. Patel',
     },
   ];
 

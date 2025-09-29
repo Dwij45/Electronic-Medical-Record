@@ -27,6 +27,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import DualCodingWidget from '../components/terminology/DualCodingWidget';
 import ConsentManager from '../components/diagnosis/ConsentManager';
+import VitalSigns from '../components/diagnosis/VitalSigns';
 import { useAuth } from '../context/AuthContext';
 import diagnosisService from '../services/diagnosis.service';
 import fhirService from '../services/fhir.service';
@@ -69,6 +70,16 @@ const PatientDiagnosis = () => {
     analytics: false,
     consentGiven: false,
     consentDate: null,
+  });
+
+  const [vitalSigns, setVitalSigns] = useState({
+    bloodPressureSystolic: '',
+    bloodPressureDiastolic: '',
+    heartRate: '',
+    respiratoryRate: '',
+    temperature: '',
+    oxygenSaturation: '',
+    notes: '',
   });
 
   const [confirmDialog, setConfirmDialog] = useState(false);
@@ -126,6 +137,7 @@ const PatientDiagnosis = () => {
         encounter: encounterData,
         diagnosis: diagnosisData,
         consent: consentData,
+        vitalSigns: vitalSigns,
         practitioner: user,
       });
 
@@ -205,6 +217,12 @@ const PatientDiagnosis = () => {
                   renderInput={(params) => <TextField {...params} fullWidth />}
                 />
               </LocalizationProvider>
+            </Grid>
+            <Grid item xs={12}>
+              <VitalSigns
+                vitalSigns={vitalSigns}
+                onVitalSignsChange={setVitalSigns}
+              />
             </Grid>
           </Grid>
         );
