@@ -187,9 +187,203 @@ const fhirService = {
     },
   }),
 
+  // Create FHIR Observation resource for vital signs
+  createVitalSignsObservations: (vitalSignsData, patientId, encounterId) => {
+    const observations = [];
+    const timestamp = format(new Date(), "yyyy-MM-dd'T'HH:mm:ssXXX");
+
+    // Blood Pressure
+    if (vitalSignsData.bloodPressureSystolic && vitalSignsData.bloodPressureDiastolic) {
+      observations.push({
+        resourceType: 'Observation',
+        id: uuidv4(),
+        status: 'final',
+        category: [{
+          coding: [{
+            system: 'http://terminology.hl7.org/CodeSystem/observation-category',
+            code: 'vital-signs',
+            display: 'Vital Signs',
+          }],
+        }],
+        code: {
+          coding: [{
+            system: 'http://loinc.org',
+            code: '85354-9',
+            display: 'Blood pressure panel with all children optional',
+          }],
+        },
+        subject: { reference: `Patient/${patientId}` },
+        encounter: { reference: `Encounter/${encounterId}` },
+        effectiveDateTime: timestamp,
+        component: [
+          {
+            code: {
+              coding: [{
+                system: 'http://loinc.org',
+                code: '8480-6',
+                display: 'Systolic blood pressure',
+              }],
+            },
+            valueQuantity: {
+              value: parseFloat(vitalSignsData.bloodPressureSystolic),
+              unit: 'mmHg',
+              system: 'http://unitsofmeasure.org',
+              code: 'mm[Hg]',
+            },
+          },
+          {
+            code: {
+              coding: [{
+                system: 'http://loinc.org',
+                code: '8462-4',
+                display: 'Diastolic blood pressure',
+              }],
+            },
+            valueQuantity: {
+              value: parseFloat(vitalSignsData.bloodPressureDiastolic),
+              unit: 'mmHg',
+              system: 'http://unitsofmeasure.org',
+              code: 'mm[Hg]',
+            },
+          },
+        ],
+      });
+    }
+
+    // Heart Rate
+    if (vitalSignsData.heartRate) {
+      observations.push({
+        resourceType: 'Observation',
+        id: uuidv4(),
+        status: 'final',
+        category: [{
+          coding: [{
+            system: 'http://terminology.hl7.org/CodeSystem/observation-category',
+            code: 'vital-signs',
+            display: 'Vital Signs',
+          }],
+        }],
+        code: {
+          coding: [{
+            system: 'http://loinc.org',
+            code: '8867-4',
+            display: 'Heart rate',
+          }],
+        },
+        subject: { reference: `Patient/${patientId}` },
+        encounter: { reference: `Encounter/${encounterId}` },
+        effectiveDateTime: timestamp,
+        valueQuantity: {
+          value: parseFloat(vitalSignsData.heartRate),
+          unit: 'beats/min',
+          system: 'http://unitsofmeasure.org',
+          code: '/min',
+        },
+      });
+    }
+
+    // Body Temperature
+    if (vitalSignsData.temperature) {
+      observations.push({
+        resourceType: 'Observation',
+        id: uuidv4(),
+        status: 'final',
+        category: [{
+          coding: [{
+            system: 'http://terminology.hl7.org/CodeSystem/observation-category',
+            code: 'vital-signs',
+            display: 'Vital Signs',
+          }],
+        }],
+        code: {
+          coding: [{
+            system: 'http://loinc.org',
+            code: '8310-5',
+            display: 'Body temperature',
+          }],
+        },
+        subject: { reference: `Patient/${patientId}` },
+        encounter: { reference: `Encounter/${encounterId}` },
+        effectiveDateTime: timestamp,
+        valueQuantity: {
+          value: parseFloat(vitalSignsData.temperature),
+          unit: 'degF',
+          system: 'http://unitsofmeasure.org',
+          code: '[degF]',
+        },
+      });
+    }
+
+    // Respiratory Rate
+    if (vitalSignsData.respiratoryRate) {
+      observations.push({
+        resourceType: 'Observation',
+        id: uuidv4(),
+        status: 'final',
+        category: [{
+          coding: [{
+            system: 'http://terminology.hl7.org/CodeSystem/observation-category',
+            code: 'vital-signs',
+            display: 'Vital Signs',
+          }],
+        }],
+        code: {
+          coding: [{
+            system: 'http://loinc.org',
+            code: '9279-1',
+            display: 'Respiratory rate',
+          }],
+        },
+        subject: { reference: `Patient/${patientId}` },
+        encounter: { reference: `Encounter/${encounterId}` },
+        effectiveDateTime: timestamp,
+        valueQuantity: {
+          value: parseFloat(vitalSignsData.respiratoryRate),
+          unit: 'breaths/min',
+          system: 'http://unitsofmeasure.org',
+          code: '/min',
+        },
+      });
+    }
+
+    // Oxygen Saturation
+    if (vitalSignsData.oxygenSaturation) {
+      observations.push({
+        resourceType: 'Observation',
+        id: uuidv4(),
+        status: 'final',
+        category: [{
+          coding: [{
+            system: 'http://terminology.hl7.org/CodeSystem/observation-category',
+            code: 'vital-signs',
+            display: 'Vital Signs',
+          }],
+        }],
+        code: {
+          coding: [{
+            system: 'http://loinc.org',
+            code: '2708-6',
+            display: 'Oxygen saturation in Arterial blood',
+          }],
+        },
+        subject: { reference: `Patient/${patientId}` },
+        encounter: { reference: `Encounter/${encounterId}` },
+        effectiveDateTime: timestamp,
+        valueQuantity: {
+          value: parseFloat(vitalSignsData.oxygenSaturation),
+          unit: '%',
+          system: 'http://unitsofmeasure.org',
+          code: '%',
+        },
+      });
+    }
+
+    return observations;
+  },
+
   // Create FHIR Bundle
   createDiagnosisBundle: async (data) => {
-    const { patient, encounter, diagnosis, consent, practitioner } = data;
+    const { patient, encounter, diagnosis, consent, vitalSigns, practitioner } = data;
 
     const patientId = patient.id || uuidv4();
     const encounterId = uuidv4();
@@ -203,6 +397,7 @@ const fhirService = {
     const encounterResource = fhirService.createEncounter(encounter, patientId, practitionerId);
     const conditionResources = fhirService.createCondition(diagnosis, patientId, encounterId);
     const consentResource = fhirService.createConsent(consent, patientId);
+    const vitalSignsObservations = vitalSigns ? fhirService.createVitalSignsObservations(vitalSigns, patientId, encounterId) : [];
 
     // Create bundle entries
     const entries = [
@@ -228,6 +423,14 @@ const fhirService = {
         request: {
           method: 'POST',
           url: 'Condition',
+        },
+      })),
+      ...vitalSignsObservations.map(observation => ({
+        fullUrl: `Observation/${observation.id}`,
+        resource: observation,
+        request: {
+          method: 'POST',
+          url: 'Observation',
         },
       })),
       {

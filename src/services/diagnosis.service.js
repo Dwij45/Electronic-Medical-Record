@@ -21,6 +21,14 @@ const diagnosisService = {
         dateOfBirth: '1985-08-22',
         gender: 'female',
         contactNumber: '+91-9876543211'
+      },
+      {
+        id: 'P003',
+        name: 'Amit Patel',
+        abhaId: '12-3456-7890-9012',
+        dateOfBirth: '1992-03-10',
+        gender: 'male',
+        contactNumber: '+91-9876543212'
       }
     ];
 
@@ -62,6 +70,13 @@ const diagnosisService = {
           primaryCode: 'N-SID-012',
           diagnosis: 'Kapha Vitiation',
           date: new Date(Date.now() - 86400000).toISOString(),
+        },
+        {
+          id: 'D003',
+          patientName: 'Amit Patel',
+          primaryCode: 'N-UNA-015',
+          diagnosis: 'Pitta Aggravation',
+          date: new Date(Date.now() - 172800000).toISOString(),
         }
       ]
     };
