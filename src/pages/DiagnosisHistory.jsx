@@ -398,7 +398,7 @@ const DiagnosisHistory = () => {
           <Grid item xs={12} md={3}>
             <Card sx={{
               background: (theme) => theme.palette.mode === 'dark'
-                ? 'linear-gradient(135deg, #4a5568 0%, #2d3748 100%)'
+                ? 'linear-gradient(135deg, #53637cff 0%, #2d3748 100%)'
                 : 'linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%)',
               color: (theme) => theme.palette.mode === 'dark' ? '#e2e8f0' : '#2d3748',
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)',

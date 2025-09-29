@@ -236,9 +236,12 @@ const MedicalCodingMapping = () => {
                 <Grid item xs={12} md={3}>
                     <Card sx={{
                         background: (theme) => theme.palette.mode === 'dark'
-                            ? 'linear-gradient(135deg, #2b6cb9 0%, #1e4a73 100%)'
+                            ? 'linear-gradientlinear-gradient(135deg, #53637cff 0%, #2d3748 100%)'
                             : 'linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)',
                         color: (theme) => theme.palette.mode === 'dark' ? '#dbeafe' : '#1e40af',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                        borderRadius: 2,
+                        border: (theme) => theme.palette.mode === 'dark' ? '1px solid #3e5d82ff' : '1px solid #dbeafe',
                         textAlign: 'center'
                     }}>
                         <CardContent>
@@ -253,9 +256,12 @@ const MedicalCodingMapping = () => {
                 <Grid item xs={12} md={3}>
                     <Card sx={{
                         background: (theme) => theme.palette.mode === 'dark'
-                            ? 'linear-gradient(135deg, #d69e2e 0%, #b7791f 100%)'
-                            : 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
-                        color: (theme) => theme.palette.mode === 'dark' ? '#fef3c7' : '#92400e',
+                            ? 'linear-gradientlinear-gradient(135deg, #53637cff 0%, #2d3748 100%)'
+                            : 'linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)',
+                        color: (theme) => theme.palette.mode === 'dark' ? '#dbeafe' : '#1e40af',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                        borderRadius: 2,
+                        border: (theme) => theme.palette.mode === 'dark' ? '1px solid #3e5d82ff' : '1px solid #dbeafe',
                         textAlign: 'center'
                     }}>
                         <CardContent>
@@ -270,9 +276,12 @@ const MedicalCodingMapping = () => {
                 <Grid item xs={12} md={3}>
                     <Card sx={{
                         background: (theme) => theme.palette.mode === 'dark'
-                            ? 'linear-gradient(135deg, #38a169 0%, #2f855a 100%)'
-                            : 'linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)',
-                        color: (theme) => theme.palette.mode === 'dark' ? '#d1fae5' : '#065f46',
+                            ? 'linear-gradientlinear-gradient(135deg, #53637cff 0%, #2d3748 100%)'
+                            : 'linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)',
+                        color: (theme) => theme.palette.mode === 'dark' ? '#dbeafe' : '#1e40af',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                        borderRadius: 2,
+                        border: (theme) => theme.palette.mode === 'dark' ? '1px solid #3e5d82ff' : '1px solid #dbeafe',
                         textAlign: 'center'
                     }}>
                         <CardContent>
@@ -287,9 +296,12 @@ const MedicalCodingMapping = () => {
                 <Grid item xs={12} md={3}>
                     <Card sx={{
                         background: (theme) => theme.palette.mode === 'dark'
-                            ? 'linear-gradient(135deg, #805ad5 0%, #553c9a 80%)'
-                            : 'linear-gradient(135deg, #e9d5ff 0%, #c4b5fd 100%)',
-                        color: (theme) => theme.palette.mode === 'dark' ? '#e9d5ff' : '#5b21b6',
+                            ? 'linear-gradientlinear-gradient(135deg, #53637cff 0%, #394760ff 100%)'
+                            : 'linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)',
+                        color: (theme) => theme.palette.mode === 'dark' ? '#dbeafe' : '#1e40af',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                        borderRadius: 2,
+                        border: (theme) => theme.palette.mode === 'dark' ? '1px solid #3e5d82ff' : '1px solid #dbeafe',
                         textAlign: 'center'
                     }}>
                         <CardContent>

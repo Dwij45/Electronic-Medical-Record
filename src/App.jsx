@@ -16,7 +16,6 @@ import Header from './components/common/Header';
 import Sidebar from './components/common/Sidebar';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import ErrorBoundary from './components/common/ErrorBoundary';
-
 // Pages
 import Login from './components/auth/Login';
 import Dashboard from './pages/Dashboard';
@@ -27,6 +26,7 @@ import Settings from './pages/Settings';
 import Profile from './pages/Profile';
 import Terminology from './pages/Terminology';
 import MedicalCodingMapping from './pages/MedicalCodingMapping';
+import DualCodingAnalytics from './pages/DualCodingAnalytics';
 
 const App = () => {
   return (
@@ -91,7 +91,7 @@ const MainContent = () => {
         <Route path="/diagnosis/new" element={<PatientDiagnosis />} />
         <Route path="/diagnosis/history" element={<DiagnosisHistory />} />
         <Route path="/terminology" element={<Terminology />} />
-        <Route path="/analytics" element={<Analytics />} />
+        <Route path="/analytics" element={<DualCodingAnalytics />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/medical-coding-mapping" element={<MedicalCodingMapping />} />
