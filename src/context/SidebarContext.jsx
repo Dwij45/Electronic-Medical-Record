@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useTheme } from '@mui/material/styles';
 import { useMediaQuery } from '@mui/material';
+import { tr } from 'date-fns/locale';
 
 const SidebarContext = createContext();
 
@@ -18,7 +19,7 @@ export const SidebarProvider = ({ children }) => {
   
   // Sidebar state - closed on mobile, open on desktop by default
   const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
-  const [sidebarMini, setSidebarMini] = useState(false);
+  const [sidebarMini, setSidebarMini] = useState(true);
 
   // Auto-close on mobile, auto-open on desktop
   useEffect(() => {
@@ -34,7 +35,7 @@ export const SidebarProvider = ({ children }) => {
   };
 
   const closeSidebar = () => {
-    setSidebarOpen(false);
+    setSidebarOpen(true);
   };
 
   return (

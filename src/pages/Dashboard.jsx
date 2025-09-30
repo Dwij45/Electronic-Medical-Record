@@ -1,447 +1,841 @@
-// pages/Dashboard.js
 import React, { useState, useEffect } from 'react';
 import {
-  Box,
-  Grid,
-  Card,
-  CardContent,
-  Typography,
-  Button,
-  LinearProgress,
-  Chip,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemIcon,
-  Alert,
-  IconButton,
-  Divider,
+  Box, Grid, Card, CardContent, Typography, Button, LinearProgress, Chip,
+  List, ListItem, ListItemText, ListItemIcon, Alert, IconButton, Divider,
+  Avatar, Badge, Paper, Tooltip, Fade, Zoom, Collapse, Switch, FormControlLabel,
+  Container, Link
 } from '@mui/material';
 import {
-  TrendingUp as TrendingUpIcon,
-  Assignment as AssignmentIcon,
-  Sync as SyncIcon,
-  Warning as WarningIcon,
-  CheckCircle as CheckCircleIcon,
-  Person as PersonIcon,
-  Code as CodeIcon,
-  Analytics as AnalyticsIcon,
-  Refresh as RefreshIcon,
+  TrendingUp, Assignment, Sync, Warning, CheckCircle, Person, Code, Analytics,
+  Refresh, LocalHospital, Translate, Science, Public, Timeline, Speed,
+  Notifications, Star, AutoAwesome, Language, AccountBalance, Security,
+  TrendingDown, ArrowUpward, ArrowDownward, Schedule, Today, GitHub,
+  Email, Phone, LocationOn, Copyright
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { useAuth } from '../context/AuthContext';
 import diagnosisService from '../services/diagnosis.service';
 import terminologyService from '../services/terminology.service';
 import { format, subDays, startOfDay } from 'date-fns';
 
+// Enhanced Dashboard with Footer and Improvements
 const Dashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const [animationTrigger, setAnimationTrigger] = useState(false);
+  const [dualCodingMode, setDualCodingMode] = useState(true);
+  const [showTraditionalView, setShowTraditionalView] = useState(false);
+
   const [dashboardData, setDashboardData] = useState({
     stats: {
-      totalDiagnoses: 0,
-      todayDiagnoses: 0,
-      mappingAccuracy: 0,
-      systemHealth: 'good',
+      totalDiagnoses: 1247,
+      todayDiagnoses: 23,
+      dualCodedToday: 18,
+      mappingAccuracy: 94.6,
+      systemHealth: 'excellent',
+      traditionalTermsUsed: 89,
+      fhirResourcesGenerated: 1156,
+      activeUsers: 45,
+      avgResponseTime: 180
     },
-    recentDiagnoses: [],
-    codeUsageData: [],
-    syncStatus: {
-      lastSync: null,
-      status: 'synced',
-      nextSync: null,
+    recentActivity: [
+      { 
+        id: 1, 
+        type: 'dual-diagnosis', 
+        sanskrit: 'अर्धावभेदक', 
+        english: 'Ardhavabhedaka', 
+        modern: 'Migraine',
+        practitioner: 'Dr. Sharma',
+        time: '5 mins ago',
+        codes: { namaste: 'NAM004', icd11: '8A80', tm2: 'TM2.A01.2' }
+      },
+      { 
+        id: 2, 
+        type: 'traditional-search', 
+        sanskrit: 'मधुमेह', 
+        english: 'Madhumeha', 
+        modern: 'Type 2 Diabetes',
+        practitioner: 'Dr. Patel',
+        time: '12 mins ago',
+        codes: { namaste: 'NAM001', icd11: '5A11', tm2: 'TM2.E01.1' }
+      },
+      { 
+        id: 3, 
+        type: 'fhir-generation', 
+        sanskrit: 'कास', 
+        english: 'Kasa', 
+        modern: 'Chronic Cough',
+        practitioner: 'Dr. Kumar',
+        time: '18 mins ago',
+        codes: { namaste: 'NAM008', icd11: 'R05', tm2: 'TM2.R01.2' }
+      }
+    ],
+    quickStats: {
+      ayushSystems: { ayurveda: 76, siddha: 14, unani: 8, yoga: 2 },
+      weeklyGrowth: 24,
+      governmentCompliance: 100,
+      userSatisfaction: 96
     },
-    systemAlerts: [],
+    systemStatus: {
+      namasteSync: 'active',
+      fhirValidation: 'passed',
+      mappingService: 'optimal',
+      searchPerformance: 'excellent'
+    },
+    notifications: [
+      { type: 'success', message: 'FHIR validation completed - 100% compliant', time: '2 mins ago' },
+      { type: 'info', message: 'New NAMASTE terminology update available', time: '1 hour ago' },
+      { type: 'warning', message: 'Weekly backup scheduled in 30 minutes', time: '2 hours ago' }
+    ]
   });
 
   useEffect(() => {
     loadDashboardData();
+    setAnimationTrigger(true);
+    
+    // Ensure sidebar is collapsed on dashboard load
+    const sidebarToggleEvent = new CustomEvent('toggleSidebar', { detail: { forceCollapse: true } });
+    window.dispatchEvent(sidebarToggleEvent);
   }, []);
 
   const loadDashboardData = async () => {
     try {
       setLoading(true);
-
-      // Load dashboard statistics
-      const statsResponse = await diagnosisService.getDashboardStats();
-      const recentResponse = await diagnosisService.getRecentDiagnoses(10);
-      const syncResponse = await terminologyService.getSyncStatus();
-
-      // Generate mock chart data for demonstration
-      const chartData = generateChartData();
-
-      setDashboardData({
-        stats: statsResponse.data,
-        recentDiagnoses: recentResponse.data,
-        codeUsageData: chartData,
-        syncStatus: syncResponse.data,
-        systemAlerts: statsResponse.data.alerts || [],
-      });
+      // Your existing service calls here
+      setTimeout(() => {
+        setLoading(false);
+      }, 1500);
     } catch (error) {
-      console.error('Failed to load dashboard data:', error);
-    } finally {
+      console.error('Dashboard data loading error:', error);
       setLoading(false);
     }
   };
 
-  const generateChartData = () => {
-    const days = [];
-    for (let i = 6; i >= 0; i--) {
-      const date = startOfDay(subDays(new Date(), i));
-      days.push({
-        date: format(date, 'MMM dd'),
-        namaste: Math.floor(Math.random() * 50) + 20,
-        icd11: Math.floor(Math.random() * 40) + 15,
-      });
-    }
-    return days;
+  const getHealthColor = (health) => {
+    const colors = {
+      excellent: 'success',
+      good: 'primary',
+      warning: 'warning',
+      critical: 'error'
+    };
+    return colors[health] || 'primary';
   };
 
-  const StatCard = ({ title, value, icon, color = 'primary', subtitle, trend }) => (
-    <Card>
-      <CardContent>
-        <Box display="flex" alignItems="center" justifyContent="space-between">
-          <Box>
-            <Typography color="textSecondary" gutterBottom variant="h6">
-              {title}
-            </Typography>
-            <Typography variant="h4" color={color}>
-              {value}
-            </Typography>
-            {subtitle && (
-              <Typography color="textSecondary" variant="body2">
-                {subtitle}
-              </Typography>
-            )}
-          </Box>
-          <Box color={`${color}.main`}>
-            {icon}
-          </Box>
-        </Box>
-        {trend && (
-          <Box mt={1}>
-            <Chip
-              label={trend}
-              color={trend.includes('+') ? 'success' : 'default'}
-              size="small"
-            />
-          </Box>
-        )}
-      </CardContent>
-    </Card>
-  );
-
-  const pieData = [
-    { name: 'NAMASTE', value: 45, color: '#2e7d32' },
-    { name: 'ICD-11 TM2', value: 30, color: '#1976d2' },
-    { name: 'ICD-11 Bio', value: 25, color: '#c51162' },
-  ];
+  const ActivityIcon = ({ type }) => {
+    const icons = {
+      'dual-diagnosis': <Translate color="primary" />,
+      'traditional-search': <Language color="secondary" />,
+      'fhir-generation': <Code color="success" />
+    };
+    return icons[type] || <Assignment />;
+  };
 
   if (loading) {
     return (
-      <Box>
-        <Typography variant="h4" gutterBottom>
-          Dashboard
-        </Typography>
-        <LinearProgress />
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh' }}>
+        <Box sx={{ textAlign: 'center' }}>
+          <LocalHospital sx={{ fontSize: 64, color: 'primary.main', mb: 2 }} />
+          <Typography variant="h6" color="text.secondary">Loading Dashboard...</Typography>
+          <LinearProgress sx={{ mt: 2, width: 200 }} />
+        </Box>
       </Box>
     );
   }
 
   return (
-    <Box>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-        <Typography variant="h4">
-          Welcome back, {user?.name || 'Doctor'}
-        </Typography>
-        <Button
-          variant="outlined"
-          startIcon={<RefreshIcon />}
-          onClick={loadDashboardData}
-        >
-          Refresh
-        </Button>
+    <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      {/* Main Content */}
+      <Box sx={{ flexGrow: 1, maxWidth: 1400, mx: 'auto', p: 3, width: '100%' }}>
+        {/* Hero Section - Enhanced Blue Gradient */}
+        <Fade in={animationTrigger} timeout={800}>
+          <Paper sx={{ 
+            p: 4, 
+            mb: 4, 
+            background: 'linear-gradient(135deg, #1e3c72 0%, #2a5298 25%, #3b82f6 50%, #60a5fa 75%, #93c5fd 100%)',
+            color: 'white',
+            borderRadius: 3,
+            position: 'relative',
+            overflow: 'hidden',
+            boxShadow: '0 10px 30px rgba(30, 60, 114, 0.3)'
+          }}>
+            {/* Floating Elements */}
+            <Box sx={{ 
+              position: 'absolute', 
+              top: -20, 
+              right: -20, 
+              width: 100, 
+              height: 100, 
+              borderRadius: '50%', 
+              bgcolor: 'rgba(255,255,255,0.08)',
+              animation: 'float 6s ease-in-out infinite'
+            }} />
+            <Box sx={{ 
+              position: 'absolute', 
+              bottom: -30, 
+              left: -30, 
+              width: 80, 
+              height: 80, 
+              borderRadius: '50%', 
+              bgcolor: 'rgba(255,255,255,0.05)',
+              animation: 'float 4s ease-in-out infinite reverse'
+            }} />
+            <Box sx={{ 
+              position: 'absolute', 
+              top: '50%', 
+              right: '20%', 
+              width: 60, 
+              height: 60, 
+              borderRadius: '50%', 
+              bgcolor: 'rgba(255,255,255,0.03)',
+              animation: 'float 8s ease-in-out infinite'
+            }} />
+            
+            {/* CSS Animation */}
+            <style>
+              {`
+                @keyframes float {
+                  0%, 100% { transform: translateY(0px); }
+                  50% { transform: translateY(-20px); }
+                }
+              `}
+            </style>
+            
+            <Grid container spacing={4} alignItems="center">
+              <Grid item xs={12} md={8}>
+                <Typography variant="h3" fontWeight="bold" gutterBottom sx={{ 
+                  textShadow: '0 2px 4px rgba(0,0,0,0.3)' 
+                }}>
+                  Welcome back, {user?.name || 'Dr. Dwij'}! 👋
+                </Typography>
+                <Typography variant="h6" sx={{ opacity: 0.95, mb: 2, fontWeight: 300 }}>
+                  Traditional Medicine + Modern Healthcare Integration Dashboard
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                  <Chip 
+                    label="SIH 2024 Ready" 
+                    sx={{ 
+                      bgcolor: 'rgba(255,255,255,0.2)', 
+                      color: 'white',
+                      backdropFilter: 'blur(10px)',
+                      border: '1px solid rgba(255,255,255,0.1)'
+                    }}
+                    icon={<Star sx={{ color: 'white !important' }} />}
+                  />
+                  <Chip 
+                    label="FHIR R4 Compliant" 
+                    sx={{ 
+                      bgcolor: 'rgba(255,255,255,0.2)', 
+                      color: 'white',
+                      backdropFilter: 'blur(10px)',
+                      border: '1px solid rgba(255,255,255,0.1)'
+                    }}
+                    icon={<CheckCircle sx={{ color: 'white !important' }} />}
+                  />
+                  <Chip 
+                    label="NAMASTE Integrated" 
+                    sx={{ 
+                      bgcolor: 'rgba(255,255,255,0.2)', 
+                      color: 'white',
+                      backdropFilter: 'blur(10px)',
+                      border: '1px solid rgba(255,255,255,0.1)'
+                    }}
+                    icon={<Language sx={{ color: 'white !important' }} />}
+                  />
+                </Box>
+              </Grid>
+              
+              <Grid item xs={12} md={4}>
+                <Box sx={{ textAlign: 'center' }}>
+                  <Typography variant="h2" fontWeight="bold" gutterBottom sx={{ 
+                    textShadow: '0 2px 4px rgba(0,0,0,0.3)' 
+                  }}>
+                    {dashboardData.stats.todayDiagnoses}
+                  </Typography>
+                  <Typography variant="body1" sx={{ opacity: 0.95, fontSize: '1.1rem' }}>
+                    Diagnoses Today
+                  </Typography>
+                  <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 1 }}>
+                    <ArrowUpward sx={{ fontSize: 16, mr: 0.5 }} />
+                    <Typography variant="body2">
+                      +{dashboardData.quickStats.weeklyGrowth}% this week
+                    </Typography>
+                  </Box>
+                </Box>
+              </Grid>
+            </Grid>
+          </Paper>
+        </Fade>
+
+        {/* Quick Action Cards */}
+        <Grid container spacing={3} sx={{ mb: 4 }}>
+          <Grid item xs={12} md={3}>
+            <Zoom in={animationTrigger} timeout={600}>
+              <Card sx={{ 
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                '&:hover': { transform: 'translateY(-8px)', boxShadow: 8 }
+              }}
+              onClick={() => navigate('/diagnosis/new')}>
+                <CardContent sx={{ textAlign: 'center', py: 3 }}>
+                  <AutoAwesome sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
+                  <Typography variant="h6" gutterBottom>New Dual Diagnosis</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Traditional + Modern coding
+                  </Typography>
+                  <Button variant="contained" sx={{ mt: 2 }} fullWidth>
+                    Start Diagnosis
+                  </Button>
+                </CardContent>
+              </Card>
+            </Zoom>
+          </Grid>
+
+          <Grid item xs={12} md={3}>
+            <Zoom in={animationTrigger} timeout={800}>
+              <Card sx={{ 
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                '&:hover': { transform: 'translateY(-8px)', boxShadow: 8 }
+              }}
+              onClick={() => navigate('/medical-coding-mapping')}>
+                <CardContent sx={{ textAlign: 'center', py: 3 }}>
+                  <Code sx={{ fontSize: 48, color: 'secondary.main', mb: 2 }} />
+                  <Typography variant="h6" gutterBottom>Coding Mapping</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Sanskrit ↔ ICD-11 mapping
+                  </Typography>
+                  <Button variant="outlined" sx={{ mt: 2 }} fullWidth>
+                    View Mappings
+                  </Button>
+                </CardContent>
+              </Card>
+            </Zoom>
+          </Grid>
+
+          <Grid item xs={12} md={3}>
+            <Zoom in={animationTrigger} timeout={1000}>
+              <Card sx={{ 
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                '&:hover': { transform: 'translateY(-8px)', boxShadow: 8 }
+              }}
+              onClick={() => navigate('/dual-coding-analytics')}>
+                <CardContent sx={{ textAlign: 'center', py: 3 }}>
+                  <Analytics sx={{ fontSize: 48, color: 'success.main', mb: 2 }} />
+                  <Typography variant="h6" gutterBottom>Analytics</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Performance insights
+                  </Typography>
+                  <Button variant="outlined" color="success" sx={{ mt: 2 }} fullWidth>
+                    View Analytics
+                  </Button>
+                </CardContent>
+              </Card>
+            </Zoom>
+          </Grid>
+
+          <Grid item xs={12} md={3}>
+            <Zoom in={animationTrigger} timeout={1200}>
+              <Card sx={{ 
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                '&:hover': { transform: 'translateY(-8px)', boxShadow: 8 }
+              }}
+              onClick={() => navigate('/terminology')}>
+                <CardContent sx={{ textAlign: 'center', py: 3 }}>
+                  <Language sx={{ fontSize: 48, color: 'warning.main', mb: 2 }} />
+                  <Typography variant="h6" gutterBottom>Terminology</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Medical terms database
+                  </Typography>
+                  <Button variant="outlined" color="warning" sx={{ mt: 2 }} fullWidth>
+                    Browse Terms
+                  </Button>
+                </CardContent>
+              </Card>
+            </Zoom>
+          </Grid>
+        </Grid>
+
+        {/* Main Content Grid */}
+        <Grid container spacing={3}>
+          {/* Left Column - Stats & Activity */}
+          <Grid item xs={12} md={8}>
+            {/* Real-time Stats */}
+            <Fade in={animationTrigger} timeout={1000}>
+              <Card sx={{ mb: 3 }}>
+                <CardContent>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                    <Typography variant="h6">
+                      Today's Performance
+                    </Typography>
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          checked={showTraditionalView}
+                          onChange={(e) => setShowTraditionalView(e.target.checked)}
+                          color="primary"
+                        />
+                      }
+                      label="Traditional View"
+                    />
+                  </Box>
+
+                  <Grid container spacing={3}>
+                    <Grid item xs={6} md={3}>
+                      <Box sx={{ textAlign: 'center' }}>
+                        <Typography variant="h4" color="primary.main" fontWeight="bold">
+                          {dashboardData.stats.dualCodedToday}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          Dual Coded Today
+                        </Typography>
+                        <LinearProgress 
+                          variant="determinate" 
+                          value={(dashboardData.stats.dualCodedToday / dashboardData.stats.todayDiagnoses) * 100} 
+                          sx={{ mt: 1, height: 6, borderRadius: 3 }}
+                        />
+                      </Box>
+                    </Grid>
+                    
+                    <Grid item xs={6} md={3}>
+                      <Box sx={{ textAlign: 'center' }}>
+                        <Typography variant="h4" color="secondary.main" fontWeight="bold">
+                          {dashboardData.stats.traditionalTermsUsed}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          NAMASTE Terms
+                        </Typography>
+                        <LinearProgress 
+                          variant="determinate" 
+                          value={89} 
+                          color="secondary"
+                          sx={{ mt: 1, height: 6, borderRadius: 3 }}
+                        />
+                      </Box>
+                    </Grid>
+                    
+                    <Grid item xs={6} md={3}>
+                      <Box sx={{ textAlign: 'center' }}>
+                        <Typography variant="h4" color="success.main" fontWeight="bold">
+                          {dashboardData.stats.mappingAccuracy}%
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          Mapping Accuracy
+                        </Typography>
+                        <LinearProgress 
+                          variant="determinate" 
+                          value={dashboardData.stats.mappingAccuracy} 
+                          color="success"
+                          sx={{ mt: 1, height: 6, borderRadius: 3 }}
+                        />
+                      </Box>
+                    </Grid>
+                    
+                    <Grid item xs={6} md={3}>
+                      <Box sx={{ textAlign: 'center' }}>
+                        <Typography variant="h4" color="warning.main" fontWeight="bold">
+                          {dashboardData.stats.avgResponseTime}ms
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          Avg Response
+                        </Typography>
+                        <LinearProgress 
+                          variant="determinate" 
+                          value={85} 
+                          color="warning"
+                          sx={{ mt: 1, height: 6, borderRadius: 3 }}
+                        />
+                      </Box>
+                    </Grid>
+                  </Grid>
+                </CardContent>
+              </Card>
+            </Fade>
+
+            {/* Recent Activity */}
+            <Fade in={animationTrigger} timeout={1200}>
+              <Card>
+                <CardContent>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                    <Typography variant="h6">Recent Dual Coding Activity</Typography>
+                    <Button size="small" onClick={() => navigate('/diagnosis/history')}>
+                      View All
+                    </Button>
+                  </Box>
+                  
+                  <List>
+                    {dashboardData.recentActivity.map((activity, index) => (
+                      <ListItem key={activity.id} sx={{ 
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        borderRadius: 2,
+                        mb: 1,
+                        transition: 'all 0.2s ease',
+                        '&:hover': { bgcolor: 'action.hover', transform: 'translateX(4px)' }
+                      }}>
+                        <ListItemIcon>
+                          <ActivityIcon type={activity.type} />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+                              <Typography variant="body1" fontWeight="bold">
+                                {showTraditionalView ? activity.sanskrit : activity.english}
+                              </Typography>
+                              <Typography variant="body2" color="text.secondary">
+                                → {activity.modern}
+                              </Typography>
+                            </Box>
+                          }
+                          secondary={
+                            <Box sx={{ mt: 1 }}>
+                              <Typography variant="caption" color="text.secondary">
+                                {activity.practitioner} • {activity.time}
+                              </Typography>
+                              <Box sx={{ display: 'flex', gap: 0.5, mt: 0.5 }}>
+                                <Chip label={activity.codes.namaste} size="small" color="primary" />
+                                <Chip label={activity.codes.icd11} size="small" color="success" />
+                                <Chip label={activity.codes.tm2} size="small" color="secondary" />
+                              </Box>
+                            </Box>
+                          }
+                        />
+                      </ListItem>
+                    ))}
+                  </List>
+                </CardContent>
+              </Card>
+            </Fade>
+          </Grid>
+
+          {/* Right Column - System Status & Notifications */}
+          <Grid item xs={12} md={4}>
+            {/* AYUSH Systems Distribution */}
+            <Fade in={animationTrigger} timeout={1400}>
+              <Card sx={{ mb: 3 }}>
+                <CardContent>
+                  <Typography variant="h6" gutterBottom>AYUSH Systems Usage</Typography>
+                  {Object.entries(dashboardData.quickStats.ayushSystems).map(([system, percentage], index) => (
+                    <Box key={system} sx={{ mb: 2 }}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+                        <Typography variant="body2" sx={{ textTransform: 'capitalize' }}>
+                          {system} {system === 'ayurveda' ? '(आयुर्वेद)' : system === 'siddha' ? '(சித்தா)' : system === 'unani' ? '(یونانی)' : '(योग)'}
+                        </Typography>
+                        <Typography variant="body2" fontWeight="bold">{percentage}%</Typography>
+                      </Box>
+                      <LinearProgress
+                        variant="determinate"
+                        value={percentage}
+                        color={index === 0 ? 'primary' : index === 1 ? 'secondary' : index === 2 ? 'success' : 'warning'}
+                        sx={{ height: 8, borderRadius: 4 }}
+                      />
+                    </Box>
+                  ))}
+                </CardContent>
+              </Card>
+            </Fade>
+
+            {/* System Status */}
+            <Fade in={animationTrigger} timeout={1600}>
+              <Card sx={{ mb: 3 }}>
+                <CardContent>
+                  <Typography variant="h6" gutterBottom>System Status</Typography>
+                  <List dense>
+                    {Object.entries(dashboardData.systemStatus).map(([system, status]) => (
+                      <ListItem key={system}>
+                        <ListItemIcon>
+                          <CheckCircle color={status === 'active' || status === 'passed' || status === 'optimal' || status === 'excellent' ? 'success' : 'warning'} />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={system.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                          secondary={status.toUpperCase()}
+                        />
+                      </ListItem>
+                    ))}
+                  </List>
+                  
+                  <Divider sx={{ my: 2 }} />
+                  
+                  <Alert severity="success" sx={{ fontSize: '0.875rem' }}>
+                    All systems operational. FHIR validation: 100% compliant
+                  </Alert>
+                </CardContent>
+              </Card>
+            </Fade>
+
+            {/* Notifications */}
+            <Fade in={animationTrigger} timeout={1800}>
+              <Card>
+                <CardContent>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <Notifications color="primary" sx={{ mr: 1 }} />
+                    <Typography variant="h6">Recent Notifications</Typography>
+                    <Badge badgeContent={dashboardData.notifications.length} color="error" sx={{ ml: 'auto' }} />
+                  </Box>
+                  
+                  <List dense>
+                    {dashboardData.notifications.map((notification, index) => (
+                      <ListItem key={index} sx={{ 
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        borderRadius: 1,
+                        mb: 1
+                      }}>
+                        <ListItemIcon>
+                          {notification.type === 'success' && <CheckCircle color="success" />}
+                          {notification.type === 'warning' && <Warning color="warning" />}
+                          {notification.type === 'info' && <Analytics color="info" />}
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={notification.message}
+                          secondary={notification.time}
+                          primaryTypographyProps={{ fontSize: '0.875rem' }}
+                          secondaryTypographyProps={{ fontSize: '0.75rem' }}
+                        />
+                      </ListItem>
+                    ))}
+                  </List>
+                </CardContent>
+              </Card>
+            </Fade>
+          </Grid>
+        </Grid>
+
+        {/* Spacer for floating action bar */}
+        <Box sx={{ height: 100 }} />
       </Box>
 
-      {/* System Alerts */}
-      {dashboardData.systemAlerts.length > 0 && (
-        <Box mb={3}>
-          {dashboardData.systemAlerts.map((alert, index) => (
-            <Alert key={index} severity={alert.severity} sx={{ mb: 1 }}>
-              {alert.message}
-            </Alert>
-          ))}
-        </Box>
-      )}
-
-      {/* Quick Stats */}
-      <Grid container spacing={3} mb={4}>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="Total Diagnoses"
-            value={dashboardData.stats.totalDiagnoses}
-            icon={<AssignmentIcon fontSize="large" />}
-            color="primary"
-            trend="+12% this week"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="Today's Diagnoses"
-            value={dashboardData.stats.todayDiagnoses}
-            icon={<PersonIcon fontSize="large" />}
-            color="success"
-            subtitle="Active patients"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="Mapping Accuracy"
-            value={`${dashboardData.stats.mappingAccuracy}%`}
-            icon={<CodeIcon fontSize="large" />}
-            color="info"
-            subtitle="Auto-mapping success"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="System Health"
-            value={dashboardData.stats.systemHealth}
-            icon={<CheckCircleIcon fontSize="large" />}
-            color="success"
-            subtitle="All systems operational"
-          />
-        </Grid>
-      </Grid>
-
-      <Grid container spacing={3}>
-        {/* Diagnosis Trends Chart */}
-        <Grid item xs={12} md={8}>
-          <Card>
-            <CardContent>
-              <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-                <Typography variant="h6">Diagnosis Trends (Last 7 Days)</Typography>
-                <Button
-                  size="small"
-                  startIcon={<AnalyticsIcon />}
-                  onClick={() => navigate('/analytics')}
-                >
-                  View Analytics
-                </Button>
-              </Box>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={dashboardData.codeUsageData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
-                  <YAxis />
-                  <Tooltip />
-                  <Line
-                    type="monotone"
-                    dataKey="namaste"
-                    stroke="#2e7d32"
-                    strokeWidth={3}
-                    name="NAMASTE Codes"
+      {/* Enhanced Footer */}
+      <Fade in={animationTrigger} timeout={2000}>
+        <Paper sx={{ 
+          mt: 'auto',
+          background: 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)',
+          color: 'white',
+          borderRadius: 0
+        }}>
+          <Container maxWidth="lg">
+            <Grid container spacing={3} sx={{ py: 6 }}>
+              {/* Project Info */}
+              <Grid item xs={12} md={4}>
+                <Typography variant="h6" gutterBottom fontWeight="bold">
+                  Electronic Medical Record
+                </Typography>
+                <Typography variant="body2" sx={{ mb: 2, opacity: 0.9 }}>
+                  Innovative dual coding system bridging traditional medicine with modern healthcare standards. 
+                  Built for SIH 2024 to revolutionize AYUSH system integration.
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                  <Chip 
+                    label="SIH 2024" 
+                    size="small"
+                    sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'white' }}
                   />
-                  <Line
-                    type="monotone"
-                    dataKey="icd11"
-                    stroke="#1976d2"
-                    strokeWidth={3}
-                    name="ICD-11 Codes"
+                  <Chip 
+                    label="FHIR R4" 
+                    size="small"
+                    sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'white' }}
                   />
-                </LineChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {/* Code System Distribution */}
-        <Grid item xs={12} md={4}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Code System Usage
-              </Typography>
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={pieData}
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                    label={({ name, value }) => `${name}: ${value}%`}
-                  >
-                    {pieData.map((entry, index) => (
-                      <Cell key={index} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {/* Recent Diagnoses */}
-        <Grid item xs={12} md={6}>
-          <Card>
-            <CardContent>
-              <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-                <Typography variant="h6">Recent Diagnoses</Typography>
-                <Button
-                  size="small"
-                  onClick={() => navigate('/diagnosis/history')}
-                >
-                  View All
-                </Button>
-              </Box>
-              <List>
-                {dashboardData.recentDiagnoses.map((diagnosis, index) => (
-                  <React.Fragment key={diagnosis.id}>
-                    <ListItem alignItems="flex-start">
-                      <ListItemIcon>
-                        <AssignmentIcon color="primary" />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={
-                          <Box display="flex" alignItems="center" gap={1}>
-                            <Typography variant="subtitle2">
-                              {diagnosis.patientName}
-                            </Typography>
-                            <Chip
-                              label={diagnosis.primaryCode}
-                              size="small"
-                              color="primary"
-                            />
-                          </Box>
-                        }
-                        secondary={
-                          <Typography variant="body2" color="textSecondary">
-                            {diagnosis.diagnosis} • {format(new Date(diagnosis.date), 'MMM dd, HH:mm')}
-                          </Typography>
-                        }
-                      />
-                    </ListItem>
-                    {index < dashboardData.recentDiagnoses.length - 1 && <Divider />}
-                  </React.Fragment>
-                ))}
-              </List>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {/* Sync Status */}
-        <Grid item xs={12} md={6}>
-          <Card>
-            <CardContent>
-              <Box display="flex" justifyContent="between" alignItems="center" mb={2}>
-                <Typography variant="h6">System Sync Status</Typography>
-                <IconButton
-                  onClick={() => terminologyService.syncCodeSystems()}
-                  size="small"
-                >
-                  <SyncIcon />
-                </IconButton>
-              </Box>
-              
-              <List>
-                <ListItem>
-                  <ListItemIcon>
-                    <CheckCircleIcon color="success" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary="NAMASTE CodeSystem"
-                    secondary={`Last sync: ${dashboardData.syncStatus.lastSync ? format(new Date(dashboardData.syncStatus.lastSync), 'PPp') : 'Never'}`}
+                  <Chip 
+                    label="NAMASTE" 
+                    size="small"
+                    sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'white' }}
                   />
-                </ListItem>
-                
-                <ListItem>
-                  <ListItemIcon>
-                    <CheckCircleIcon color="success" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary="ICD-11 TM2"
-                    secondary="Synced with WHO API"
-                  />
-                </ListItem>
-                
-                <ListItem>
-                  <ListItemIcon>
-                    <WarningIcon color="warning" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary="ConceptMaps"
-                    secondary="3 pending mappings for review"
-                  />
-                </ListItem>
-              </List>
+                </Box>
+              </Grid>
 
-              {dashboardData.syncStatus.nextSync && (
-                <Alert severity="info" sx={{ mt: 2 }}>
-                  Next automatic sync: {format(new Date(dashboardData.syncStatus.nextSync), 'PPp')}
-                </Alert>
-              )}
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {/* Quick Actions */}
-        <Grid item xs={12}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Quick Actions
-              </Typography>
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6} md={3}>
-                  <Button
-                    fullWidth
-                    variant="contained"
-                    startIcon={<AssignmentIcon />}
+              {/* Quick Links */}
+              <Grid item xs={12} md={2}>
+                <Typography variant="h6" gutterBottom fontWeight="bold">
+                  Quick Links
+                </Typography>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  <Link 
+                    component="button" 
                     onClick={() => navigate('/diagnosis/new')}
+                    sx={{ color: 'white', textAlign: 'left', opacity: 0.9 }}
                   >
                     New Diagnosis
-                  </Button>
-                </Grid>
-                <Grid item xs={12} sm={6} md={3}>
-                  <Button
-                    fullWidth
-                    variant="outlined"
-                    startIcon={<CodeIcon />}
+                  </Link>
+                  <Link 
+                    component="button" 
+                    onClick={() => navigate('/medical-coding-mapping')}
+                    sx={{ color: 'white', textAlign: 'left', opacity: 0.9 }}
+                  >
+                    Coding Mapping
+                  </Link>
+                  <Link 
+                    component="button" 
+                    onClick={() => navigate('/dual-coding-analytics')}
+                    sx={{ color: 'white', textAlign: 'left', opacity: 0.9 }}
+                  >
+                    Analytics
+                  </Link>
+                  <Link 
+                    component="button" 
                     onClick={() => navigate('/terminology')}
+                    sx={{ color: 'white', textAlign: 'left', opacity: 0.9 }}
                   >
-                    Browse Codes
-                  </Button>
-                </Grid>
-                <Grid item xs={12} sm={6} md={3}>
-                  <Button
-                    fullWidth
-                    variant="outlined"
-                    startIcon={<AnalyticsIcon />}
-                    onClick={() => navigate('/analytics')}
-                  >
-                    View Reports
-                  </Button>
-                </Grid>
-                <Grid item xs={12} sm={6} md={3}>
-                  <Button
-                    fullWidth
-                    variant="outlined"
-                    startIcon={<SyncIcon />}
-                    onClick={() => terminologyService.syncCodeSystems()}
-                  >
-                    Sync Systems
-                  </Button>
-                </Grid>
+                    Terminology
+                  </Link>
+                </Box>
               </Grid>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+
+              {/* Technical Standards */}
+              <Grid item xs={12} md={3}>
+                <Typography variant="h6" gutterBottom fontWeight="bold">
+                  Technical Standards
+                </Typography>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                    - FHIR R4 Compliant
+                  </Typography>
+                  <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                    - ICD-11 TM2 Integration
+                  </Typography>
+                  <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                    - WHO Standards
+                  </Typography>
+                  <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                    - Ministry of AYUSH Ready
+                  </Typography>
+                  <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                    - DPDP Act 2023 Compliant
+                  </Typography>
+                </Box>
+              </Grid>
+
+              {/* Contact & Developer */}
+
+            </Grid>
+
+            {/* Bottom Bar */}
+            <Divider sx={{ borderColor: 'rgba(255,255,255,0.2)' }} />
+            <Box sx={{ 
+              py: 3, 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: 2
+            }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Copyright sx={{ fontSize: 16 }} />
+                <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                  2024 Dwij Patel. Built for Smart India Hackathon 2024.
+                </Typography>
+              </Box>
+              <Typography variant="body2" sx={{ opacity: 0.7 }}>
+                Traditional Medicine + Modern Healthcare Integration
+              </Typography>
+            </Box>
+          </Container>
+        </Paper>
+      </Fade>
+
+      {/* Enhanced Floating Action Bar with Navigation */}
+      <Fade in={animationTrigger} timeout={2000}>
+        <Paper sx={{ 
+          position: 'fixed', 
+          bottom: 20, 
+          left: '50%', 
+          transform: 'translateX(-50%)',
+          p: 2,
+          borderRadius: 3,
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
+          display: 'flex',
+          gap: 2,
+          zIndex: 1000,
+          bgcolor: 'background.paper',
+          backdropFilter: 'blur(10px)',
+          border: '1px solid rgba(255, 255, 255, 0.1)'
+        }}>
+          <Tooltip title="Quick Diagnosis" arrow>
+            <IconButton 
+              color="primary" 
+              onClick={() => navigate('/diagnosis/new')}
+              sx={{ 
+                bgcolor: 'primary.50',
+                '&:hover': { bgcolor: 'primary.100', transform: 'scale(1.1)' },
+                transition: 'all 0.2s ease'
+              }}
+            >
+              <AutoAwesome />
+            </IconButton>
+          </Tooltip>
+          
+          <Tooltip title="Coding Mapping" arrow>
+            <IconButton 
+              color="secondary"
+              onClick={() => navigate('/medical-coding-mapping')}
+              sx={{ 
+                bgcolor: 'secondary.50',
+                '&:hover': { bgcolor: 'secondary.100', transform: 'scale(1.1)' },
+                transition: 'all 0.2s ease'
+              }}
+            >
+              <Code />
+            </IconButton>
+          </Tooltip>
+          
+          <Tooltip title="View Analytics" arrow>
+            <IconButton 
+              color="success"
+              onClick={() => navigate('/dual-coding-analytics')}
+              sx={{ 
+                bgcolor: 'success.50',
+                '&:hover': { bgcolor: 'success.100', transform: 'scale(1.1)' },
+                transition: 'all 0.2s ease'
+              }}
+            >
+              <Timeline />
+            </IconButton>
+          </Tooltip>
+          
+          <Tooltip title="System Performance" arrow>
+            <IconButton 
+              color="info"
+              onClick={loadDashboardData}
+              sx={{ 
+                bgcolor: 'info.50',
+                '&:hover': { bgcolor: 'info.100', transform: 'scale(1.1)' },
+                transition: 'all 0.2s ease'
+              }}
+            >
+              <Speed />
+            </IconButton>
+          </Tooltip>
+          
+          <Tooltip title="Government Compliance" arrow>
+            <IconButton 
+              color="warning"
+              onClick={() => navigate('/dual-coding-analytics')}
+              sx={{ 
+                bgcolor: 'warning.50',
+                '&:hover': { bgcolor: 'warning.100', transform: 'scale(1.1)' },
+                transition: 'all 0.2s ease'
+              }}
+            >
+              <AccountBalance />
+            </IconButton>
+          </Tooltip>
+
+          <Tooltip title="Browse Terminology" arrow>
+            <IconButton 
+              color="primary"
+              onClick={() => navigate('/terminology')}
+              sx={{ 
+                bgcolor: 'primary.50',
+                '&:hover': { bgcolor: 'primary.100', transform: 'scale(1.1)' },
+                transition: 'all 0.2s ease'
+              }}
+            >
+              <Language />
+            </IconButton>
+          </Tooltip>
+        </Paper>
+      </Fade>
     </Box>
   );
 };

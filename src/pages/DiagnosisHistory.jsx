@@ -398,12 +398,14 @@ const DiagnosisHistory = () => {
           <Grid item xs={12} md={3}>
             <Card sx={{
               background: (theme) => theme.palette.mode === 'dark'
-                ? 'linear-gradient(135deg, #53637cff 0%, #2d3748 100%)'
-                : 'linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%)',
-              color: (theme) => theme.palette.mode === 'dark' ? '#e2e8f0' : '#2d3748',
+                ? 'linear-gradientlinear-gradient(135deg, #53637cff 0%, #2d3748 100%)'
+                : 'linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)',
+              color: (theme) => theme.palette.mode === 'dark' ? '#dbeafe' : '#1e40af',
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
               borderRadius: 2,
-              border: (theme) => theme.palette.mode === 'dark' ? '1px solid #4a5568' : '1px solid #e2e8f0'
+              border: (theme) => theme.palette.mode === 'dark' ? '1px solid #3e5d82ff' : '1px solid #dbeafe',
+              textAlign: 'center'
+
             }}>
               <CardContent sx={{ textAlign: 'center' }}>
                 <Typography variant="h4" fontWeight="bold">{diagnosisHistory.length}</Typography>
@@ -414,12 +416,14 @@ const DiagnosisHistory = () => {
           <Grid item xs={12} md={3}>
             <Card sx={{
               background: (theme) => theme.palette.mode === 'dark'
-                ? 'linear-gradient(135deg, #2b6cb9 0%, #1e4a73 100%)'
+                ? 'linear-gradientlinear-gradient(135deg, #53637cff 0%, #2d3748 100%)'
                 : 'linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)',
               color: (theme) => theme.palette.mode === 'dark' ? '#dbeafe' : '#1e40af',
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
               borderRadius: 2,
-              border: (theme) => theme.palette.mode === 'dark' ? '1px solid #2b6cb9' : '1px solid #dbeafe'
+              border: (theme) => theme.palette.mode === 'dark' ? '1px solid #3e5d82ff' : '1px solid #dbeafe',
+              textAlign: 'center'
+
             }}>
               <CardContent sx={{ textAlign: 'center' }}>
                 <Typography variant="h4" fontWeight="bold">
@@ -432,12 +436,14 @@ const DiagnosisHistory = () => {
           <Grid item xs={12} md={3}>
             <Card sx={{
               background: (theme) => theme.palette.mode === 'dark'
-                ? 'linear-gradient(135deg, #38a169 0%, #2f855a 100%)'
-                : 'linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)',
-              color: (theme) => theme.palette.mode === 'dark' ? '#d1fae5' : '#065f46',
+                ? 'linear-gradientlinear-gradient(135deg, #53637cff 0%, #2d3748 100%)'
+                : 'linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)',
+              color: (theme) => theme.palette.mode === 'dark' ? '#dbeafe' : '#1e40af',
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
               borderRadius: 2,
-              border: (theme) => theme.palette.mode === 'dark' ? '1px solid #38a169' : '1px solid #d1fae5'
+              border: (theme) => theme.palette.mode === 'dark' ? '1px solid #3e5d82ff' : '1px solid #dbeafe',
+              textAlign: 'center'
+
             }}>
               <CardContent sx={{ textAlign: 'center' }}>
                 <Typography variant="h4" fontWeight="bold">{uniquePractitioners.length}</Typography>
@@ -448,12 +454,14 @@ const DiagnosisHistory = () => {
           <Grid item xs={12} md={3}>
             <Card sx={{
               background: (theme) => theme.palette.mode === 'dark'
-                ? 'linear-gradient(135deg, #d69e2e 0%, #b7791f 100%)'
-                : 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
-              color: (theme) => theme.palette.mode === 'dark' ? '#fef3c7' : '#92400e',
+                ? 'linear-gradientlinear-gradient(135deg, #53637cff 0%, #2d3748 100%)'
+                : 'linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)',
+              color: (theme) => theme.palette.mode === 'dark' ? '#dbeafe' : '#1e40af',
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
               borderRadius: 2,
-              border: (theme) => theme.palette.mode === 'dark' ? '1px solid #d69e2e' : '1px solid #fef3c7'
+              border: (theme) => theme.palette.mode === 'dark' ? '1px solid #3e5d82ff' : '1px solid #dbeafe',
+              textAlign: 'center'
+
             }}>
               <CardContent sx={{ textAlign: 'center' }}>
                 <Typography variant="h4" fontWeight="bold">
