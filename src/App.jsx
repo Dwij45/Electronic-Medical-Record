@@ -16,6 +16,7 @@ import Header from './components/common/Header';
 import Sidebar from './components/common/Sidebar';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import ErrorBoundary from './components/common/ErrorBoundary';
+
 // Pages
 import Login from './components/auth/Login';
 import Dashboard from './pages/Dashboard';
@@ -27,6 +28,9 @@ import Profile from './pages/Profile';
 import Terminology from './pages/Terminology';
 import MedicalCodingMapping from './pages/MedicalCodingMapping';
 import DualCodingAnalytics from './pages/DualCodingAnalytics';
+
+// Add Patient Dashboard Import
+import PatientDashboard from './pages/PatientDashboard';
 
 const App = () => {
   return (
@@ -42,6 +46,9 @@ const App = () => {
                     <Routes>
                       {/* Public Routes */}
                       <Route path="/login" element={<Login />} />
+                      
+                      {/* Patient Dashboard - Public Route (ABHA authenticated) */}
+                      <Route path="/patient-dashboard" element={<PatientDashboard />} />
 
                       {/* Protected Routes */}
                       <Route path="/*" element={
@@ -95,6 +102,9 @@ const MainContent = () => {
         <Route path="/settings" element={<Settings />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/medical-coding-mapping" element={<MedicalCodingMapping />} />
+        
+        {/* Patient Dashboard also available in protected routes for doctors to access */}
+        <Route path="/patient-dashboard" element={<PatientDashboard />} />
       </Routes>
     </Box>
   );

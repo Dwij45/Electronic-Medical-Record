@@ -40,31 +40,31 @@ const Dashboard = () => {
       avgResponseTime: 180
     },
     recentActivity: [
-      { 
-        id: 1, 
-        type: 'dual-diagnosis', 
-        sanskrit: 'अर्धावभेदक', 
-        english: 'Ardhavabhedaka', 
+      {
+        id: 1,
+        type: 'dual-diagnosis',
+        sanskrit: 'अर्धावभेदक',
+        english: 'Ardhavabhedaka',
         modern: 'Migraine',
         practitioner: 'Dr. Sharma',
         time: '5 mins ago',
         codes: { namaste: 'NAM004', icd11: '8A80', tm2: 'TM2.A01.2' }
       },
-      { 
-        id: 2, 
-        type: 'traditional-search', 
-        sanskrit: 'मधुमेह', 
-        english: 'Madhumeha', 
+      {
+        id: 2,
+        type: 'traditional-search',
+        sanskrit: 'मधुमेह',
+        english: 'Madhumeha',
         modern: 'Type 2 Diabetes',
         practitioner: 'Dr. Patel',
         time: '12 mins ago',
         codes: { namaste: 'NAM001', icd11: '5A11', tm2: 'TM2.E01.1' }
       },
-      { 
-        id: 3, 
-        type: 'fhir-generation', 
-        sanskrit: 'कास', 
-        english: 'Kasa', 
+      {
+        id: 3,
+        type: 'fhir-generation',
+        sanskrit: 'कास',
+        english: 'Kasa',
         modern: 'Chronic Cough',
         practitioner: 'Dr. Kumar',
         time: '18 mins ago',
@@ -93,7 +93,7 @@ const Dashboard = () => {
   useEffect(() => {
     loadDashboardData();
     setAnimationTrigger(true);
-    
+
     // Ensure sidebar is collapsed on dashboard load
     const sidebarToggleEvent = new CustomEvent('toggleSidebar', { detail: { forceCollapse: true } });
     window.dispatchEvent(sidebarToggleEvent);
@@ -149,9 +149,9 @@ const Dashboard = () => {
       <Box sx={{ flexGrow: 1, maxWidth: 1400, mx: 'auto', p: 3, width: '100%' }}>
         {/* Hero Section - Enhanced Blue Gradient */}
         <Fade in={animationTrigger} timeout={800}>
-          <Paper sx={{ 
-            p: 4, 
-            mb: 4, 
+          <Paper sx={{
+            p: 4,
+            mb: 4,
             background: 'linear-gradient(135deg, #1e3c72 0%, #2a5298 25%, #3b82f6 50%, #60a5fa 75%, #93c5fd 100%)',
             color: 'white',
             borderRadius: 3,
@@ -160,37 +160,37 @@ const Dashboard = () => {
             boxShadow: '0 10px 30px rgba(30, 60, 114, 0.3)'
           }}>
             {/* Floating Elements */}
-            <Box sx={{ 
-              position: 'absolute', 
-              top: -20, 
-              right: -20, 
-              width: 100, 
-              height: 100, 
-              borderRadius: '50%', 
+            <Box sx={{
+              position: 'absolute',
+              top: -20,
+              right: -20,
+              width: 100,
+              height: 100,
+              borderRadius: '50%',
               bgcolor: 'rgba(255,255,255,0.08)',
               animation: 'float 6s ease-in-out infinite'
             }} />
-            <Box sx={{ 
-              position: 'absolute', 
-              bottom: -30, 
-              left: -30, 
-              width: 80, 
-              height: 80, 
-              borderRadius: '50%', 
+            <Box sx={{
+              position: 'absolute',
+              bottom: -30,
+              left: -30,
+              width: 80,
+              height: 80,
+              borderRadius: '50%',
               bgcolor: 'rgba(255,255,255,0.05)',
               animation: 'float 4s ease-in-out infinite reverse'
             }} />
-            <Box sx={{ 
-              position: 'absolute', 
-              top: '50%', 
-              right: '20%', 
-              width: 60, 
-              height: 60, 
-              borderRadius: '50%', 
+            <Box sx={{
+              position: 'absolute',
+              top: '50%',
+              right: '20%',
+              width: 60,
+              height: 60,
+              borderRadius: '50%',
               bgcolor: 'rgba(255,255,255,0.03)',
               animation: 'float 8s ease-in-out infinite'
             }} />
-            
+
             {/* CSS Animation */}
             <style>
               {`
@@ -200,42 +200,33 @@ const Dashboard = () => {
                 }
               `}
             </style>
-            
+
             <Grid container spacing={4} alignItems="center">
               <Grid item xs={12} md={8}>
-                <Typography variant="h3" fontWeight="bold" gutterBottom sx={{ 
-                  textShadow: '0 2px 4px rgba(0,0,0,0.3)' 
+                <Typography variant="h3" fontWeight="bold" gutterBottom sx={{
+                  textShadow: '0 2px 4px rgba(0,0,0,0.3)'
                 }}>
-                  Welcome back, {user?.name || 'Dr. Dwij'}! 👋
+                  Welcome back, {user?.name || 'Dr. Dwij'}!
                 </Typography>
                 <Typography variant="h6" sx={{ opacity: 0.95, mb: 2, fontWeight: 300 }}>
                   Traditional Medicine + Modern Healthcare Integration Dashboard
                 </Typography>
                 <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                  <Chip 
-                    label="SIH 2024 Ready" 
-                    sx={{ 
-                      bgcolor: 'rgba(255,255,255,0.2)', 
-                      color: 'white',
-                      backdropFilter: 'blur(10px)',
-                      border: '1px solid rgba(255,255,255,0.1)'
-                    }}
-                    icon={<Star sx={{ color: 'white !important' }} />}
-                  />
-                  <Chip 
-                    label="FHIR R4 Compliant" 
-                    sx={{ 
-                      bgcolor: 'rgba(255,255,255,0.2)', 
+
+                  <Chip
+                    label="FHIR R4 Compliant"
+                    sx={{
+                      bgcolor: 'rgba(255,255,255,0.2)',
                       color: 'white',
                       backdropFilter: 'blur(10px)',
                       border: '1px solid rgba(255,255,255,0.1)'
                     }}
                     icon={<CheckCircle sx={{ color: 'white !important' }} />}
                   />
-                  <Chip 
-                    label="NAMASTE Integrated" 
-                    sx={{ 
-                      bgcolor: 'rgba(255,255,255,0.2)', 
+                  <Chip
+                    label="NAMASTE Integrated"
+                    sx={{
+                      bgcolor: 'rgba(255,255,255,0.2)',
                       color: 'white',
                       backdropFilter: 'blur(10px)',
                       border: '1px solid rgba(255,255,255,0.1)'
@@ -244,11 +235,11 @@ const Dashboard = () => {
                   />
                 </Box>
               </Grid>
-              
+
               <Grid item xs={12} md={4}>
                 <Box sx={{ textAlign: 'center' }}>
-                  <Typography variant="h2" fontWeight="bold" gutterBottom sx={{ 
-                    textShadow: '0 2px 4px rgba(0,0,0,0.3)' 
+                  <Typography variant="h2" fontWeight="bold" gutterBottom sx={{
+                    textShadow: '0 2px 4px rgba(0,0,0,0.3)'
                   }}>
                     {dashboardData.stats.todayDiagnoses}
                   </Typography>
@@ -271,12 +262,12 @@ const Dashboard = () => {
         <Grid container spacing={3} sx={{ mb: 4 }}>
           <Grid item xs={12} md={3}>
             <Zoom in={animationTrigger} timeout={600}>
-              <Card sx={{ 
+              <Card sx={{
                 cursor: 'pointer',
                 transition: 'all 0.3s ease',
                 '&:hover': { transform: 'translateY(-8px)', boxShadow: 8 }
               }}
-              onClick={() => navigate('/diagnosis/new')}>
+                onClick={() => navigate('/diagnosis/new')}>
                 <CardContent sx={{ textAlign: 'center', py: 3 }}>
                   <AutoAwesome sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
                   <Typography variant="h6" gutterBottom>New Dual Diagnosis</Typography>
@@ -293,12 +284,12 @@ const Dashboard = () => {
 
           <Grid item xs={12} md={3}>
             <Zoom in={animationTrigger} timeout={800}>
-              <Card sx={{ 
+              <Card sx={{
                 cursor: 'pointer',
                 transition: 'all 0.3s ease',
                 '&:hover': { transform: 'translateY(-8px)', boxShadow: 8 }
               }}
-              onClick={() => navigate('/medical-coding-mapping')}>
+                onClick={() => navigate('/medical-coding-mapping')}>
                 <CardContent sx={{ textAlign: 'center', py: 3 }}>
                   <Code sx={{ fontSize: 48, color: 'secondary.main', mb: 2 }} />
                   <Typography variant="h6" gutterBottom>Coding Mapping</Typography>
@@ -315,12 +306,12 @@ const Dashboard = () => {
 
           <Grid item xs={12} md={3}>
             <Zoom in={animationTrigger} timeout={1000}>
-              <Card sx={{ 
+              <Card sx={{
                 cursor: 'pointer',
                 transition: 'all 0.3s ease',
                 '&:hover': { transform: 'translateY(-8px)', boxShadow: 8 }
               }}
-              onClick={() => navigate('/dual-coding-analytics')}>
+                onClick={() => navigate('/dual-coding-analytics')}>
                 <CardContent sx={{ textAlign: 'center', py: 3 }}>
                   <Analytics sx={{ fontSize: 48, color: 'success.main', mb: 2 }} />
                   <Typography variant="h6" gutterBottom>Analytics</Typography>
@@ -337,12 +328,12 @@ const Dashboard = () => {
 
           <Grid item xs={12} md={3}>
             <Zoom in={animationTrigger} timeout={1200}>
-              <Card sx={{ 
+              <Card sx={{
                 cursor: 'pointer',
                 transition: 'all 0.3s ease',
                 '&:hover': { transform: 'translateY(-8px)', boxShadow: 8 }
               }}
-              onClick={() => navigate('/terminology')}>
+                onClick={() => navigate('/terminology')}>
                 <CardContent sx={{ textAlign: 'center', py: 3 }}>
                   <Language sx={{ fontSize: 48, color: 'warning.main', mb: 2 }} />
                   <Typography variant="h6" gutterBottom>Terminology</Typography>
@@ -391,14 +382,14 @@ const Dashboard = () => {
                         <Typography variant="body2" color="text.secondary">
                           Dual Coded Today
                         </Typography>
-                        <LinearProgress 
-                          variant="determinate" 
-                          value={(dashboardData.stats.dualCodedToday / dashboardData.stats.todayDiagnoses) * 100} 
+                        <LinearProgress
+                          variant="determinate"
+                          value={(dashboardData.stats.dualCodedToday / dashboardData.stats.todayDiagnoses) * 100}
                           sx={{ mt: 1, height: 6, borderRadius: 3 }}
                         />
                       </Box>
                     </Grid>
-                    
+
                     <Grid item xs={6} md={3}>
                       <Box sx={{ textAlign: 'center' }}>
                         <Typography variant="h4" color="secondary.main" fontWeight="bold">
@@ -407,15 +398,15 @@ const Dashboard = () => {
                         <Typography variant="body2" color="text.secondary">
                           NAMASTE Terms
                         </Typography>
-                        <LinearProgress 
-                          variant="determinate" 
-                          value={89} 
+                        <LinearProgress
+                          variant="determinate"
+                          value={89}
                           color="secondary"
                           sx={{ mt: 1, height: 6, borderRadius: 3 }}
                         />
                       </Box>
                     </Grid>
-                    
+
                     <Grid item xs={6} md={3}>
                       <Box sx={{ textAlign: 'center' }}>
                         <Typography variant="h4" color="success.main" fontWeight="bold">
@@ -424,15 +415,15 @@ const Dashboard = () => {
                         <Typography variant="body2" color="text.secondary">
                           Mapping Accuracy
                         </Typography>
-                        <LinearProgress 
-                          variant="determinate" 
-                          value={dashboardData.stats.mappingAccuracy} 
+                        <LinearProgress
+                          variant="determinate"
+                          value={dashboardData.stats.mappingAccuracy}
                           color="success"
                           sx={{ mt: 1, height: 6, borderRadius: 3 }}
                         />
                       </Box>
                     </Grid>
-                    
+
                     <Grid item xs={6} md={3}>
                       <Box sx={{ textAlign: 'center' }}>
                         <Typography variant="h4" color="warning.main" fontWeight="bold">
@@ -441,9 +432,9 @@ const Dashboard = () => {
                         <Typography variant="body2" color="text.secondary">
                           Avg Response
                         </Typography>
-                        <LinearProgress 
-                          variant="determinate" 
-                          value={85} 
+                        <LinearProgress
+                          variant="determinate"
+                          value={85}
                           color="warning"
                           sx={{ mt: 1, height: 6, borderRadius: 3 }}
                         />
@@ -464,10 +455,10 @@ const Dashboard = () => {
                       View All
                     </Button>
                   </Box>
-                  
+
                   <List>
                     {dashboardData.recentActivity.map((activity, index) => (
-                      <ListItem key={activity.id} sx={{ 
+                      <ListItem key={activity.id} sx={{
                         border: '1px solid',
                         borderColor: 'divider',
                         borderRadius: 2,
@@ -555,9 +546,9 @@ const Dashboard = () => {
                       </ListItem>
                     ))}
                   </List>
-                  
+
                   <Divider sx={{ my: 2 }} />
-                  
+
                   <Alert severity="success" sx={{ fontSize: '0.875rem' }}>
                     All systems operational. FHIR validation: 100% compliant
                   </Alert>
@@ -574,10 +565,10 @@ const Dashboard = () => {
                     <Typography variant="h6">Recent Notifications</Typography>
                     <Badge badgeContent={dashboardData.notifications.length} color="error" sx={{ ml: 'auto' }} />
                   </Box>
-                  
+
                   <List dense>
                     {dashboardData.notifications.map((notification, index) => (
-                      <ListItem key={index} sx={{ 
+                      <ListItem key={index} sx={{
                         border: '1px solid',
                         borderColor: 'divider',
                         borderRadius: 1,
@@ -609,7 +600,7 @@ const Dashboard = () => {
 
       {/* Enhanced Footer */}
       <Fade in={animationTrigger} timeout={2000}>
-        <Paper sx={{ 
+        <Paper sx={{
           mt: 'auto',
           background: 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)',
           color: 'white',
@@ -623,22 +614,22 @@ const Dashboard = () => {
                   Electronic Medical Record
                 </Typography>
                 <Typography variant="body2" sx={{ mb: 2, opacity: 0.9 }}>
-                  Innovative dual coding system bridging traditional medicine with modern healthcare standards. 
-                  Built for SIH 2024 to revolutionize AYUSH system integration.
+                  Innovative dual coding system bridging traditional medicine with modern healthcare standards.
+                  Built for SIH 2025 to revolutionize AYUSH system integration.
                 </Typography>
                 <Box sx={{ display: 'flex', gap: 1 }}>
-                  <Chip 
-                    label="SIH 2024" 
+                  <Chip
+                    label="SIH 2025"
                     size="small"
                     sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'white' }}
                   />
-                  <Chip 
-                    label="FHIR R4" 
+                  <Chip
+                    label="FHIR R4"
                     size="small"
                     sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'white' }}
                   />
-                  <Chip 
-                    label="NAMASTE" 
+                  <Chip
+                    label="NAMASTE"
                     size="small"
                     sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'white' }}
                   />
@@ -651,29 +642,29 @@ const Dashboard = () => {
                   Quick Links
                 </Typography>
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                  <Link 
-                    component="button" 
+                  <Link
+                    component="button"
                     onClick={() => navigate('/diagnosis/new')}
                     sx={{ color: 'white', textAlign: 'left', opacity: 0.9 }}
                   >
                     New Diagnosis
                   </Link>
-                  <Link 
-                    component="button" 
+                  <Link
+                    component="button"
                     onClick={() => navigate('/medical-coding-mapping')}
                     sx={{ color: 'white', textAlign: 'left', opacity: 0.9 }}
                   >
                     Coding Mapping
                   </Link>
-                  <Link 
-                    component="button" 
+                  <Link
+                    component="button"
                     onClick={() => navigate('/dual-coding-analytics')}
                     sx={{ color: 'white', textAlign: 'left', opacity: 0.9 }}
                   >
                     Analytics
                   </Link>
-                  <Link 
-                    component="button" 
+                  <Link
+                    component="button"
                     onClick={() => navigate('/terminology')}
                     sx={{ color: 'white', textAlign: 'left', opacity: 0.9 }}
                   >
@@ -712,10 +703,10 @@ const Dashboard = () => {
 
             {/* Bottom Bar */}
             <Divider sx={{ borderColor: 'rgba(255,255,255,0.2)' }} />
-            <Box sx={{ 
-              py: 3, 
-              display: 'flex', 
-              justifyContent: 'space-between', 
+            <Box sx={{
+              py: 3,
+              display: 'flex',
+              justifyContent: 'space-between',
               alignItems: 'center',
               flexWrap: 'wrap',
               gap: 2
@@ -723,7 +714,7 @@ const Dashboard = () => {
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <Copyright sx={{ fontSize: 16 }} />
                 <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                  2024 Dwij Patel. Built for Smart India Hackathon 2024.
+                  Built for Smart India Hackathon 2025.
                 </Typography>
               </Box>
               <Typography variant="body2" sx={{ opacity: 0.7 }}>
@@ -736,10 +727,10 @@ const Dashboard = () => {
 
       {/* Enhanced Floating Action Bar with Navigation */}
       <Fade in={animationTrigger} timeout={2000}>
-        <Paper sx={{ 
-          position: 'fixed', 
-          bottom: 20, 
-          left: '50%', 
+        <Paper sx={{
+          position: 'fixed',
+          bottom: 20,
+          left: '50%',
           transform: 'translateX(-50%)',
           p: 2,
           borderRadius: 3,
@@ -752,10 +743,10 @@ const Dashboard = () => {
           border: '1px solid rgba(255, 255, 255, 0.1)'
         }}>
           <Tooltip title="Quick Diagnosis" arrow>
-            <IconButton 
-              color="primary" 
+            <IconButton
+              color="primary"
               onClick={() => navigate('/diagnosis/new')}
-              sx={{ 
+              sx={{
                 bgcolor: 'primary.50',
                 '&:hover': { bgcolor: 'primary.100', transform: 'scale(1.1)' },
                 transition: 'all 0.2s ease'
@@ -764,12 +755,12 @@ const Dashboard = () => {
               <AutoAwesome />
             </IconButton>
           </Tooltip>
-          
+
           <Tooltip title="Coding Mapping" arrow>
-            <IconButton 
+            <IconButton
               color="secondary"
               onClick={() => navigate('/medical-coding-mapping')}
-              sx={{ 
+              sx={{
                 bgcolor: 'secondary.50',
                 '&:hover': { bgcolor: 'secondary.100', transform: 'scale(1.1)' },
                 transition: 'all 0.2s ease'
@@ -778,12 +769,12 @@ const Dashboard = () => {
               <Code />
             </IconButton>
           </Tooltip>
-          
+
           <Tooltip title="View Analytics" arrow>
-            <IconButton 
+            <IconButton
               color="success"
               onClick={() => navigate('/dual-coding-analytics')}
-              sx={{ 
+              sx={{
                 bgcolor: 'success.50',
                 '&:hover': { bgcolor: 'success.100', transform: 'scale(1.1)' },
                 transition: 'all 0.2s ease'
@@ -792,12 +783,12 @@ const Dashboard = () => {
               <Timeline />
             </IconButton>
           </Tooltip>
-          
+
           <Tooltip title="System Performance" arrow>
-            <IconButton 
+            <IconButton
               color="info"
               onClick={loadDashboardData}
-              sx={{ 
+              sx={{
                 bgcolor: 'info.50',
                 '&:hover': { bgcolor: 'info.100', transform: 'scale(1.1)' },
                 transition: 'all 0.2s ease'
@@ -806,12 +797,12 @@ const Dashboard = () => {
               <Speed />
             </IconButton>
           </Tooltip>
-          
+
           <Tooltip title="Government Compliance" arrow>
-            <IconButton 
+            <IconButton
               color="warning"
               onClick={() => navigate('/dual-coding-analytics')}
-              sx={{ 
+              sx={{
                 bgcolor: 'warning.50',
                 '&:hover': { bgcolor: 'warning.100', transform: 'scale(1.1)' },
                 transition: 'all 0.2s ease'
@@ -822,10 +813,10 @@ const Dashboard = () => {
           </Tooltip>
 
           <Tooltip title="Browse Terminology" arrow>
-            <IconButton 
+            <IconButton
               color="primary"
               onClick={() => navigate('/terminology')}
-              sx={{ 
+              sx={{
                 bgcolor: 'primary.50',
                 '&:hover': { bgcolor: 'primary.100', transform: 'scale(1.1)' },
                 transition: 'all 0.2s ease'

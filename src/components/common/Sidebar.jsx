@@ -31,6 +31,7 @@ import {
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useSidebar } from '../../context/SidebarContext';
 import { useThemeMode } from '../../context/ThemeContext';
+import { AccountCircle } from '@mui/icons-material';
 
 const DRAWER_WIDTH = 280;
 const MINI_DRAWER_WIDTH = 64;
@@ -45,7 +46,7 @@ const menuItems = [
   },
   { text: 'Diagnosis History', icon: <HistoryIcon />, path: '/diagnosis/history' },
   { text: 'Terminology', icon: <Book />, path: '/terminology' },
-  { text: 'Analytics', icon: <AnalyticsIcon />, path: '/analytics' },
+  { text: 'Analytics', icon: <AnalyticsIcon />, path: '/analytics' }
 ];
 
 const bottomMenuItems = [
