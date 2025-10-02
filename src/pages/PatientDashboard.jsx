@@ -162,7 +162,7 @@ const PatientDashboard = () => {
                             <ArrowBack />
                         </IconButton>
                         <Typography variant="h6">
-                            🏥 Patient Portal - {patient.name.split(' ')[0]}
+                             Patient Portal - {patient.name.split(' ')[0]}
                         </Typography>
                     </Box>
 
@@ -824,24 +824,8 @@ const PatientDashboard = () => {
                         All data is secured with ABHA authentication and complies with FHIR R4 standards for global healthcare interoperability.
                     </Typography>
 
-                    <Grid container spacing={3} sx={{ mt: 2 }}>
-                        <Grid item xs={6} md={3}>
-                            <Box sx={{
-                                p: 2,
-                                border: '1px solid',
-                                borderColor: 'divider',
-                                borderRadius: 2,
-                                transition: 'all 0.3s ease',
-                                '&:hover': { bgcolor: 'action.hover' }
-                            }}>
-                                <Typography variant="body2" fontWeight="bold" color="primary">
-                                    SIH 2024
-                                </Typography>
-                                <Typography variant="caption" color="text.secondary">
-                                    Smart India Hackathon
-                                </Typography>
-                            </Box>
-                        </Grid>
+                    <Grid container spacing={3} sx={{ mt: 2 }} display="flex" justifyContent={"space-around"}>
+                        
                         <Grid item xs={6} md={3}>
                             <Box sx={{
                                 p: 2,
