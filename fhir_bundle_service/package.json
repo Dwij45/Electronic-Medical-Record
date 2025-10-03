@@ -1,0 +1,19 @@
+{
+  "name": "fhir_bundle_service",
+  "version": "1.0.0",
+  "main": "index.js",
+  "description": "Microservice for uploading and retrieving FHIR Bundles from HAPI FHIR",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "author": "Dwij45",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "axios": "^1.6.7"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
