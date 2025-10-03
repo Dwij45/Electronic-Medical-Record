@@ -1,0 +1,20 @@
+{
+  "name": "conceptmap_service",
+  "version": "1.0.0",
+  "description": "Microservice for storing and mapping NAMASTE <-> TM2 codes using fuzzy matching",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "author": "Dwij45",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^7.0.3",
+    "string-similarity": "^4.0.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
