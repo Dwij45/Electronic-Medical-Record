@@ -237,7 +237,7 @@ const Sidebar = () => {
       {(!sidebarMini || isMobile) && (
         <Box sx={{ p: 2, textAlign: 'center' }}>
           <Typography variant="caption" color="text.secondary">
-            Healthcare EMR v1.0
+            DualMed : The Healthcare EMR v1.0
           </Typography>
           <Typography variant="caption" display="block" color="text.secondary">
             Ministry of Ayush Compliant

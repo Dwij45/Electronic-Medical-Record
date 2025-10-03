@@ -111,21 +111,21 @@ const Header = () => {
           {getSidebarIcon()}
         </IconButton>
 
-        <Typography 
-          variant="h6" 
-          noWrap 
-          component="div" 
-          sx={{ 
+        <Typography
+          variant="h6"
+          noWrap
+          component="div"
+          sx={{
             flexGrow: 1,
             fontSize: { xs: '1rem', sm: '1.25rem' }
           }}
         >
-          Healthcare EMR
-          <Typography 
-            component="span" 
-            variant="caption" 
-            sx={{ 
-              ml: 1, 
+          DualMed : The Healthcare EMR
+          <Typography
+            component="span"
+            variant="caption"
+            sx={{
+              ml: 1,
               display: { xs: 'none', md: 'inline' }
             }}
           >
@@ -149,7 +149,7 @@ const Header = () => {
               disabled={syncing}
               sx={{ display: { xs: 'none', sm: 'flex' } }}
             >
-              <SyncIcon sx={{ 
+              <SyncIcon sx={{
                 animation: syncing ? 'spin 1s linear infinite' : 'none',
                 '@keyframes spin': {
                   '0%': { transform: 'rotate(0deg)' },
@@ -170,8 +170,8 @@ const Header = () => {
 
           {/* Settings - Hidden on mobile */}
           <Tooltip title="Settings">
-            <IconButton 
-              color="inherit" 
+            <IconButton
+              color="inherit"
               onClick={handleSettings}
               sx={{ display: { xs: 'none', sm: 'flex' } }}
             >
@@ -181,8 +181,8 @@ const Header = () => {
 
           {/* User Menu */}
           <Box display="flex" alignItems="center" gap={1}>
-            <Typography 
-              variant="body2" 
+            <Typography
+              variant="body2"
               sx={{ display: { xs: 'none', sm: 'block' } }}
             >
               {user?.name?.split(' ')[0] || 'User'}
