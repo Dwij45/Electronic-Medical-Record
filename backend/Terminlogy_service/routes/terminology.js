@@ -9,9 +9,9 @@ const {
 
 // Ingest NAMASTE CSV
 router.post('/ingest/namaste', async (req, res) => {
-  const { fileUrl } = req.body;
+  // const { fileUrl } = req.body;
   try {
-    const result = await ingestNamasteCSV(fileUrl);
+    const result = await ingestNamasteCSV();
     res.json(result);
   } catch (e) {
     res.status(500).json({ error: e.message });
@@ -20,9 +20,9 @@ router.post('/ingest/namaste', async (req, res) => {
 
 // Ingest ICD-11 CSV
 router.post('/ingest/icd11', async (req, res) => {
-  const { fileUrl } = req.body;
+  // const { fileUrl } = req.body;
   try {
-    const result = await ingestICD11CSV(fileUrl);
+    const result = await ingestICD11CSV();
     res.json(result);
   } catch (e) {
     res.status(500).json({ error: e.message });
@@ -35,6 +35,7 @@ router.get('/normalize/:system', async (req, res) => {
     const { system } = req.params;
     const data = await cleanNormalize(system);
     res.json(data);
+    console.log(data);
   } catch (e) {
     res.status(500).json({ error: e.message });
   }

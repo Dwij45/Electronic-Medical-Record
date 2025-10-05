@@ -4,20 +4,22 @@ const NamasteCode = require('../models/NamasteCode');
 const ICD11Code = require('../models/ICD11Code');
 
 // Ingest NAMASTE CSV
-async function ingestNamasteCSV(fileUrl) {
-  const filePath = fileUrl || path.join(__dirname, '../demo/namaste.csv');
+async function ingestNamasteCSV() {
+  const filePath = path.join(__dirname, '../demo/namaste.csv');
   const jsonArray = await csv().fromFile(filePath);
   await NamasteCode.deleteMany({});
   await NamasteCode.insertMany(jsonArray);
+  console.log(jsonArray);
   return { loaded: jsonArray.length };
 }
 
 // Ingest ICD-11 CSV
-async function ingestICD11CSV(fileUrl) {
-  const filePath = fileUrl || path.join(__dirname, '../demo/icd11.csv');
+async function ingestICD11CSV() {
+  const filePath = path.join(__dirname, '../demo/icd11.csv');
   const jsonArray = await csv().fromFile(filePath);
   await ICD11Code.deleteMany({});
   await ICD11Code.insertMany(jsonArray);
+  console.log(jsonArray);
   return { loaded: jsonArray.length };
 }
 

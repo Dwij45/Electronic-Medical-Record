@@ -1,15 +1,15 @@
 const express = require('express');
-const router = express.Router();
+const fhirerouter = express.Router();
 const {
   uploadBundle,
   getBundle,
   searchBundles
-} = require('../services/fhir');
+} = require('../services/fhire')
 
 // POST /fhir/bundle
-router.post('/bundle', async (req, res) => {
+fhirerouter.post('/bundle', async (req, res) => {
   try {
-    const result = await uploadBundle(req.body);
+    const result = await uploadBundle();
     res.json(result);
   } catch (e) {
     res.status(500).json({ error: e.message });
@@ -17,7 +17,7 @@ router.post('/bundle', async (req, res) => {
 });
 
 // GET /fhir/bundle/:id
-router.get('/bundle/:id', async (req, res) => {
+fhirerouter.get('/bundle/:id', async (req, res) => {
   try {
     const bundle = await getBundle(req.params.id);
     res.json(bundle);
@@ -28,7 +28,7 @@ router.get('/bundle/:id', async (req, res) => {
 
 // GET /fhir/bundle
 // Example: /fhir/bundle?patient=123&_count=10
-router.get('/bundle', async (req, res) => {
+fhirerouter.get('/bundle', async (req, res) => {
   try {
     const bundles = await searchBundles(req.query);
     res.json(bundles);
@@ -37,4 +37,4 @@ router.get('/bundle', async (req, res) => {
   }
 });
 
-module.exports = router;
+module.exports = fhirerouter;

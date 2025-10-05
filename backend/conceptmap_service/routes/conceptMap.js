@@ -9,8 +9,8 @@ const {
 
 // POST /conceptmap/import-demo
 router.post('/import-demo', async (req, res) => {
-  const { fileUrl } = req.body;
-  const result = await importDemoConceptMap(fileUrl);
+  // const { fileUrl } = req.body;
+  const result = await importDemoConceptMap();
   res.json(result);
 });
 
